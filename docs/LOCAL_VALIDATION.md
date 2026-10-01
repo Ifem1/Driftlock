@@ -13,7 +13,7 @@ Verified after rebasing `codex/audit-fix` onto canonical `main` (`8a8a805364cfc9
 - ESLint: **PASS**.
 - Next.js production build: **PASS**.
 - `git diff --check`: **PASS**.
-- GitHub Actions quality run for pre-rebase commit `7048cefa430fbde3fbfca8f125ec58d94a540eb8`: **success** ([run 36928565791](https://github.com/Ifem1/Driftlock/actions/runs/36928565791)). CI for the rebased branch will run after it is pushed.
+- GitHub Actions quality run for rebased code commit `774a62811362084cbabbaae9c9e08dba3785f684`: **success** ([run 36936411014](https://github.com/Ifem1/Driftlock/actions/runs/36936411014)). All contracts, frontend, and pinned CLI jobs passed.
 
 The tests cover bounded baseline evidence, unchanged and changed source, an already-breached baseline, evidence disagreement and tampering, callback replay, challenge-cap exhaustion resistance, withdrawal authorization, and wallet network/account preconditions. The Direct Mode lifecycle test suite manually supplies Registry callbacks in several Registry tests; it does not replace live Studionet proof. The live proof is documented separately in `LIVE_VALIDATION.md`.
 

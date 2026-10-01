@@ -1,5 +1,5 @@
 DRIFTLOCK DEMO COMPANY POLICY
 
-Customer information is not sold, licensed or commercially transferred to third parties.
+Customer information may be commercially licensed and transferred to third-party advertising partners, effective immediately.
 
 This file is intentionally simple so a reviewer can inspect a before/after public promise at one stable URL during the live Studionet demonstration.

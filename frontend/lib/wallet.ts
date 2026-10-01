@@ -27,6 +27,21 @@ export function sameWallet(left?: string | null, right?: string | null): boolean
   return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
+export type ClipboardWriter = { writeText: (value: string) => Promise<void> };
+
+export function isStudionetChain(chainId?: number | null): boolean {
+  return chainId === CHAIN_ID;
+}
+
+export async function copyWalletAddress(address: string, clipboard?: ClipboardWriter | null): Promise<void> {
+  if (!address) throw new Error("No wallet address to copy");
+  const writer = clipboard === undefined
+    ? (typeof navigator === "undefined" ? null : navigator.clipboard)
+    : clipboard;
+  if (!writer?.writeText) throw new Error("Clipboard is not available");
+  await writer.writeText(address);
+}
+
 export async function ensureStudionet(): Promise<void> {
   const provider = injectedProvider();
   if (!provider) throw new Error("No injected EIP-1193 wallet found");
@@ -119,7 +134,7 @@ function useWalletState(): WalletState {
   }, []);
 
   return {
-    address, chainId, ready, connected: !!address, correctNetwork: chainId === CHAIN_ID,
+    address, chainId, ready, connected: !!address, correctNetwork: isStudionetChain(chainId),
     hasProvider: !!injectedProvider(), connect, disconnect, refresh, switchNetwork: ensureStudionet,
   };
 }

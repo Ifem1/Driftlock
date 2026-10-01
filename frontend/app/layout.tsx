@@ -10,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><Providers><SiteHeader/><main>{children}</main><SiteFooter/></Providers></body></html>;
+  return <html lang="en"><body><Providers><div className="site-atmosphere" aria-hidden="true"><i className="ambient-orb ambient-orb-a"/><i className="ambient-orb ambient-orb-b"/><i className="ambient-orb ambient-orb-c"/><span className="atmosphere-grain"/></div><SiteHeader/><main>{children}</main><SiteFooter/></Providers></body></html>;
 }

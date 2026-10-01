@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight, Coins } from "lucide-react";
 import { toast } from "sonner";
 import { getCredit, listWalletChallenges, protocolConfigured, submitWrite, waitForFinalization } from "@/lib/protocol";
@@ -16,6 +17,7 @@ export default function ActivityPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [busy, setBusy] = useState(false);
   const configured = protocolConfigured();
+  const reduce = useReducedMotion();
 
   async function refresh() {
     if (!configured || !wallet.address) return;
@@ -38,6 +40,6 @@ export default function ActivityPage() {
   return <section className="page-shell activity-page">
     <div className="page-intro"><span className="mono-label">WALLET LEDGER / FINALIZED STATE</span><h1>Your stake.<br/><em>Your traces.</em></h1><p>Challenge history and claimable GEN read directly from DriftRegistry.</p></div>
     {!configured && <div className="deployment-note"><strong>Protocol address not configured.</strong><span>Wallet ledger activates after deployment.</span></div>}
-    {!wallet.connected ? <div className="connect-stage"><Coins size={36}/><h2>Connect a wallet to open your ledger.</h2><button className="cta light" onClick={() => void wallet.connect()}>Connect wallet</button></div> : <div className="activity-layout"><aside className="credit-panel"><span className="mono-label">AVAILABLE CREDIT</span><strong>{attoToGen(credit, 6)}<i> GEN</i></strong><p>Credits are pull-based. Settlement records what you can claim before any transfer is attempted.</p><button disabled={busy || BigInt(credit) === 0n} onClick={() => void withdraw()}>{busy ? "Withdrawing…" : "Withdraw credit"}</button></aside><div className="wallet-history"><div className="section-mini-head"><span className="mono-label">MY CHALLENGES / {challenges.length}</span><h2>Inspection history.</h2></div>{!challenges.length && <div className="empty-editorial">No challenges from this wallet yet.</div>}{challenges.map((h) => <Link key={h.id} href={`/covenants/${h.covenant_id}`} className="activity-row"><div><StatusPill status={h.status}/><strong>{h.id}</strong></div><span>{h.covenant_id}</span><time>{isoLabel(h.created_at)}</time><ArrowUpRight/></Link>)}</div></div>}
+    {!wallet.connected ? <div className="connect-stage"><Coins size={36}/><h2>Connect a wallet to open your ledger.</h2><button className="cta light" onClick={() => void wallet.connect()}>Connect wallet</button></div> : <div className="activity-layout"><aside className="credit-panel"><span className="mono-label">AVAILABLE CREDIT</span><motion.strong key={credit} initial={reduce ? false : { opacity: .45, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : .35 }}>{attoToGen(credit, 6)}<i> GEN</i></motion.strong><p>Credits are pull-based. Settlement records what you can claim before any transfer is attempted.</p><button disabled={busy || BigInt(credit) === 0n} onClick={() => void withdraw()}>{busy ? "Withdrawing…" : "Withdraw credit"}</button></aside><div className="wallet-history"><div className="section-mini-head"><span className="mono-label">MY CHALLENGES / {challenges.length}</span><h2>Inspection history.</h2></div>{!challenges.length && <div className="empty-editorial">No challenges from this wallet yet.</div>}{challenges.map((h) => <Link key={h.id} href={`/covenants/${h.covenant_id}`} className="activity-row"><div><StatusPill status={h.status}/><strong>{h.id}</strong></div><span>{h.covenant_id}</span><time>{isoLabel(h.created_at)}</time><ArrowUpRight/></Link>)}</div></div>}
   </section>;
 }

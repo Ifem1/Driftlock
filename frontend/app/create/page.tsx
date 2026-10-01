@@ -10,6 +10,8 @@ import { genToAtto } from "@/lib/format";
 import { useInjectedWallet, EXPLORER_URL } from "@/lib/wallet";
 
 const labels = ["Source", "Promise", "Breach rule", "Permitted changes", "Beneficiary", "Stake", "Expiry", "Review"];
+const submitStages = ["wallet", "submitted", "consensus", "finalized"] as const;
+type SubmitStage = "idle" | typeof submitStages[number];
 
 type FormState = {
   title: string; subject: string; canonicalUrl: string; promise: string; breachRule: string;
@@ -27,6 +29,7 @@ export default function CreatePage() {
   const [form, setForm] = useState<FormState>(initial);
   const [busy, setBusy] = useState(false);
   const [tx, setTx] = useState("");
+  const [submitStage, setSubmitStage] = useState<SubmitStage>("idle");
   const wallet = useInjectedWallet();
   const router = useRouter();
   const configured = protocolConfigured();
@@ -52,7 +55,7 @@ export default function CreatePage() {
 
   async function submit() {
     if (!configured) return toast.error("Registry is not configured yet.");
-    setBusy(true); setTx("");
+    setBusy(true); setTx(""); setSubmitStage("wallet");
     try {
       const address = wallet.address || await wallet.connect();
       if (!wallet.correctNetwork) await wallet.switchNetwork();
@@ -60,14 +63,28 @@ export default function CreatePage() {
         form.title.trim(), form.subject.trim(), form.canonicalUrl.trim(), form.promise.trim(), form.breachRule.trim(),
         form.permitted.trim(), form.beneficiary, BigInt(Math.round(Number(form.rewardPercent) * 100)), BigInt(expiry),
       ], genToAtto(form.stake));
-      setTx(hash); toast("Covenant submitted", { description: "Your terms are now waiting for source-grounded baseline consensus." });
+      setTx(hash);
+      setSubmitStage("submitted");
+      toast("Covenant submitted", { description: "The transaction is accepted. Waiting for source-grounded baseline consensus." });
+      setSubmitStage("consensus");
       await waitForFinalization(hash);
+      setSubmitStage("finalized");
       toast.success("Creation transaction finalized");
       const id = await findLatestCovenantByOwner(address, true);
       if (id) router.push(`/covenants/${id}`);
-    } catch (e) { toast.error(e instanceof Error ? e.message : String(e)); }
+    } catch (e) {
+      setSubmitStage((stage) => stage === "wallet" ? "idle" : stage);
+      toast.error(e instanceof Error ? e.message : String(e));
+    }
     finally { setBusy(false); }
   }
+
+  const submitStageIndex = submitStages.indexOf(submitStage === "idle" ? "wallet" : submitStage);
+  const submitLabel = busy
+    ? submitStage === "wallet" ? "Awaiting wallet approval…"
+      : submitStage === "submitted" ? "Transaction submitted…"
+      : "Consensus pending…"
+    : submitStage === "finalized" ? "Finalized" : "Sign & lock covenant";
 
   return <section className="composer-shell">
     <div className="composer-head"><span className="mono-label">CREATE / IMMUTABLE AFTER BASELINE</span><h1>Compose the<br/><em>covenant.</em></h1><p>Each step becomes part of what GenLayer will later judge. Be precise now; active covenants cannot be silently rewritten.</p></div>
@@ -83,10 +100,10 @@ export default function CreatePage() {
         {step === 4 && <><span className="step-overline">05 / BENEFICIARY</span><h2>Who receives the remaining stake after a confirmed breach?</h2><label>Beneficiary address <input value={form.beneficiary} onChange={(e) => update("beneficiary", e.target.value)} placeholder="0x…"/></label><p className="field-note">This address becomes immutable after activation. It does not need to be the covenant owner.</p></>}
         {step === 5 && <><span className="step-overline">06 / ECONOMICS</span><h2>Put value behind the promise.</h2><div className="split-fields"><label>Stake / GEN <input inputMode="decimal" value={form.stake} onChange={(e) => update("stake", e.target.value)}/></label><label>Finder reward / % <input inputMode="decimal" value={form.rewardPercent} onChange={(e) => update("rewardPercent", e.target.value)}/></label></div><p className="field-note">On confirmed breach, the finder reward goes to the challenger and the remaining stake goes to the beneficiary. Otherwise the covenant owner recovers unbreached stake at expiry.</p></>}
         {step === 6 && <><span className="step-overline">07 / EXPIRY</span><h2>How long should the promise stay under stake?</h2><label>Lifetime in hours <input inputMode="numeric" value={form.expiryHours} onChange={(e) => update("expiryHours", e.target.value)}/></label><div className="expiry-preview">Projected expiry <strong>{new Date(expiry * 1000).toUTCString()}</strong></div></>}
-        {step === 7 && <><span className="step-overline">08 / REVIEW</span><h2>These terms are about to lock.</h2><div className="review-lock"><LockKeyhole/><div><small>{form.title || "UNTITLED COVENANT"}</small><blockquote>“{form.promise || "No protected promise entered."}”</blockquote></div></div><dl className="review-grid"><div><dt>Canonical source</dt><dd>{form.canonicalUrl || "—"}</dd></div><div><dt>Beneficiary</dt><dd>{form.beneficiary || "—"}</dd></div><div><dt>Stake</dt><dd>{form.stake} GEN</dd></div><div><dt>Finder reward</dt><dd>{form.rewardPercent}%</dd></div><div><dt>Expiry</dt><dd>{new Date(expiry*1000).toUTCString()}</dd></div></dl><p className="field-note">Signing creates BASELINE_PENDING first. The covenant becomes ACTIVE only after GenLayer independently verifies that the canonical source actually supports the protected promise.</p>{tx && <a className="tx-proof" href={`${EXPLORER_URL}/tx/${tx}`} target="_blank" rel="noreferrer">Submitted transaction <ExternalLink size={12}/></a>}</>}
+        {step === 7 && <><span className="step-overline">08 / REVIEW</span><h2>These terms are about to lock.</h2><div className="review-lock"><LockKeyhole/><div><small>{form.title || "UNTITLED COVENANT"}</small><blockquote>“{form.promise || "No protected promise entered."}”</blockquote></div></div><dl className="review-grid"><div><dt>Canonical source</dt><dd>{form.canonicalUrl || "—"}</dd></div><div><dt>Beneficiary</dt><dd>{form.beneficiary || "—"}</dd></div><div><dt>Stake</dt><dd>{form.stake} GEN</dd></div><div><dt>Finder reward</dt><dd>{form.rewardPercent}%</dd></div><div><dt>Expiry</dt><dd>{new Date(expiry*1000).toUTCString()}</dd></div></dl><p className="field-note">Signing creates BASELINE_PENDING first. The covenant becomes ACTIVE only after GenLayer independently verifies that the canonical source actually supports the protected promise.</p>{submitStage !== "idle" && <div className="tx-state-rail" aria-live="polite">{submitStages.map((stageName, i) => <div key={stageName} className={`tx-state-step ${i < submitStageIndex ? "done" : i === submitStageIndex ? "current" : ""}`}><span>{i < submitStageIndex || submitStage === "finalized" && i === submitStageIndex ? <Check size={11}/> : String(i+1).padStart(2,"0")}</span><b>{stageName === "wallet" ? "Wallet approval" : stageName === "submitted" ? "Transaction submitted" : stageName === "consensus" ? "Consensus pending" : "Finalized"}</b></div>)}</div>}{tx && <a className="tx-proof" href={`${EXPLORER_URL}/tx/${tx}`} target="_blank" rel="noreferrer">Submitted transaction <ExternalLink size={12}/></a>}</>}
       </motion.div>
     </AnimatePresence></div>
 
-    <div className="composer-actions"><button className="composer-back" disabled={step === 0 || busy} onClick={back}><ArrowLeft size={15}/> Back</button>{step < labels.length - 1 ? <button className="composer-next" onClick={next}>Continue <ArrowRight size={15}/></button> : <button className="composer-next signal-button" disabled={busy || !configured} onClick={() => void submit()}>{busy ? "Waiting for finality…" : "Sign & lock covenant"}<LockKeyhole size={15}/></button>}</div>
+    <div className="composer-actions"><button className="composer-back" disabled={step === 0 || busy} onClick={back}><ArrowLeft size={15}/> Back</button>{step < labels.length - 1 ? <button className="composer-next" onClick={next}>Continue <ArrowRight size={15}/></button> : <button className="composer-next signal-button" disabled={busy || !configured} onClick={() => void submit()}>{submitLabel}<LockKeyhole size={15}/></button>}</div>
   </section>;
 }

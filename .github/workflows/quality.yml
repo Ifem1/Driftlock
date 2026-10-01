@@ -18,7 +18,7 @@ jobs:
       - run: genvm-lint check contracts/drift_registry.py --json
       - run: genvm-lint check contracts/source_inspector.py --json
       - run: genvm-lint check contracts/breach_judge.py --json
-      - run: pytest tests/direct/ -v
+      - run: python -m pytest tests/direct/ -v
 
   cli:
     runs-on: ubuntu-latest

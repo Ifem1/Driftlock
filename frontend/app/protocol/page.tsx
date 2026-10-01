@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { CheckCheck, Database, Globe2, Scale, ScanLine, WalletCards } from "lucide-react";
+import { CheckCheck, Database, Globe2, Scale, WalletCards } from "lucide-react";
 
 const nodes = [
   [Globe2, "PUBLIC SOURCE", "The canonical HTTPS URL is frozen at activation. Challenges re-fetch this source, not challenger-supplied evidence."],

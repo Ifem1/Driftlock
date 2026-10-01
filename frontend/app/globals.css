@@ -631,3 +631,54 @@ body{
       linear-gradient(135deg,#090505,#190906 48%,#0B0605);
   }
 }
+
+
+/* === DEPLOYED HERO COLLISION FIX === */
+/*
+  Fixes observed on the deployed desktop hero:
+  1) keep the hero tall enough in browser viewports whose content area is shorter than 768px;
+  2) prevent the sticky story scene from painting above its own section;
+  3) force Chromium/WebKit gradient text clipping for SHOULDN'T instead of a solid gradient box.
+*/
+@media (min-width:961px){
+  .home-hero{
+    min-height:clamp(620px,82svh,760px);
+  }
+}
+
+.story-shell{
+  overflow:clip;
+  isolation:isolate;
+}
+
+.home-hero h1 .hero-shouldnt{
+  display:inline-block;
+  background:linear-gradient(100deg,#8A281D 0%,#E05B34 24%,#FFE5D0 50%,#DE5631 74%,#8A281D 100%);
+  background-size:320% 100%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+  text-shadow:none;
+  filter:drop-shadow(0 0 12px rgba(211,87,50,.16));
+}
+
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .home-hero h1 .hero-shouldnt{
+    background:none;
+    color:#E56A43;
+    -webkit-text-fill-color:#E56A43;
+  }
+}
+
+@media (max-width:960px){
+  .home-hero{
+    min-height:86svh;
+  }
+}
+@media (max-width:700px){
+  .home-hero{
+    min-height:100svh;
+  }
+}

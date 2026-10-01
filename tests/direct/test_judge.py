@@ -3,8 +3,8 @@ import pytest
 from tests.direct.conftest import addr, capture, warp
 
 
-def material():
-    return json.dumps({"status":"MATERIAL_CHANGE","source_accessible":True,"same_subject":True,"promise_still_supported":False,"relevant_change_detected":True,"new_conflicting_term":True,"effective_now":True,"basis":"Material relevant change."})
+def material(challenge_id="dc-1"):
+    return json.dumps({"request_id":challenge_id,"kind":"CURRENT","source_url":"https://example.com/policy","baseline_digest":"baseline-digest","status":"MATERIAL_CHANGE","source_accessible":True,"same_subject":True,"promise_still_supported":False,"relevant_change_detected":True,"new_conflicting_term":True,"effective_now":True,"basis":"Material relevant change."})
 
 
 def verdict(outcome="BREACH"):
@@ -29,7 +29,7 @@ def test_breach_validator_rejects_opposite_outcome(direct_vm, direct_deploy, dir
     warp(direct_vm); contract = direct_deploy("contracts/breach_judge.py", addr(direct_alice)); direct_vm.sender = direct_alice
     direct_vm.mock_web(r".*example\.com/policy.*", {"status":200,"body":"Customer data may be licensed to partners."})
     direct_vm.mock_llm(r"(?s).*DRIFTLOCK_BREACH_JUDGE_V1.*", json.dumps(verdict()))
-    contract.judge_breach("dc-2", addr(direct_alice), "Customer data", "https://example.com/policy", "Data is not sold.", "Licensing is breach.", "Formatting allowed.", material())
+    contract.judge_breach("dc-2", addr(direct_alice), "Customer data", "https://example.com/policy", "Data is not sold.", "Licensing is breach.", "Formatting allowed.", material("dc-2"))
     direct_vm.clear_mocks(); direct_vm.mock_web(r".*example\.com/policy.*", {"status":200,"body":"Customer data may be licensed to partners."})
     direct_vm.mock_llm(r"(?s).*DRIFTLOCK_BREACH_JUDGE_V1.*", json.dumps(verdict("PERMITTED_CHANGE")))
     assert direct_vm.run_validator() is False
@@ -45,3 +45,9 @@ def test_judge_rejects_wrong_registry_sender(direct_vm, direct_deploy, direct_al
     warp(direct_vm); contract = direct_deploy("contracts/breach_judge.py", addr(direct_alice)); direct_vm.sender = direct_bob
     with pytest.raises(Exception, match="configured registry"):
         contract.judge_breach("dc-x", addr(direct_bob), "Subject", "https://example.com", "Promise", "Rule", "Allowed", material())
+
+
+def test_judge_rejects_inspection_from_other_challenge(direct_vm, direct_deploy, direct_alice):
+    warp(direct_vm); contract = direct_deploy("contracts/breach_judge.py", addr(direct_alice)); direct_vm.sender = direct_alice
+    with pytest.raises(Exception, match="challenge mismatch"):
+        contract.judge_breach("dc-2", addr(direct_alice), "Customer data", "https://example.com/policy", "Data is not sold.", "Licensing is breach.", "Formatting allowed.", material("dc-1"))

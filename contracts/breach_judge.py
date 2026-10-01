@@ -3,6 +3,7 @@
 from genlayer import *
 import json
 import re
+import hashlib
 from datetime import datetime, timezone
 
 VERSION = "0.1.0-studionet"
@@ -68,7 +69,9 @@ def _judge(subject: str, source_url: str, protected_promise: str, breach_rule: s
         inspection = json.loads(inspection_json)
     except Exception:
         raise gl.vm.UserError("[EXPECTED] malformed verified inspection packet") from None
-    if not isinstance(inspection, dict) or inspection.get("status") != "MATERIAL_CHANGE":
+    if (not isinstance(inspection, dict) or inspection.get("status") != "MATERIAL_CHANGE"
+            or inspection.get("kind") != "CURRENT" or not inspection.get("request_id")
+            or inspection.get("source_url") != source_url or not inspection.get("baseline_digest")):
         raise gl.vm.UserError("[EXPECTED] judge requires a verified material-change inspection")
 
     def leader_fn() -> dict:
@@ -138,9 +141,15 @@ class BreachJudge(gl.Contract):
             raise gl.vm.UserError("[EXPECTED] breach request must come from the configured registry")
         if challenge_id in self.results:
             raise gl.vm.UserError("[EXPECTED] breach request already processed")
+        inspection = json.loads(inspection_json)
+        if inspection.get("status") != "MATERIAL_CHANGE":
+            raise gl.vm.UserError("[EXPECTED] judge requires a verified material-change inspection")
+        if inspection.get("request_id") != challenge_id:
+            raise gl.vm.UserError("[EXPECTED] inspection packet challenge mismatch")
         result = _judge(subject, source_url, protected_promise, breach_rule, permitted_changes, inspection_json)
         result.update({"request_id": challenge_id, "recorded_at": _iso(),
-                       "provenance": "GENLAYER_INDEPENDENT_BREACH_REPLAY"})
+                       "provenance": "GENLAYER_INDEPENDENT_BREACH_REPLAY",
+                       "inspection_digest": hashlib.sha256(inspection_json.encode("utf-8")).hexdigest()})
         self.results[challenge_id] = _json(result)
         self.request_ids.append(challenge_id)
         if result["outcome"] == "BREACH":

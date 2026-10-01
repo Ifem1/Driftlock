@@ -2,6 +2,8 @@ export type BaselineReview = {
   status?: "BASELINE_VERIFIED" | "PROMISE_NOT_SUPPORTED" | "SOURCE_UNAVAILABLE" | "AMBIGUOUS" | string;
   basis?: string;
   recorded_at?: string;
+  baseline_text?: string;
+  baseline_digest?: string;
   [key: string]: unknown;
 };
 
@@ -9,6 +11,8 @@ export type InspectionReview = {
   status?: "NO_RELEVANT_CHANGE" | "MATERIAL_CHANGE" | "SOURCE_UNAVAILABLE" | "AMBIGUOUS" | string;
   basis?: string;
   recorded_at?: string;
+  current_digest?: string;
+  current_excerpt?: string;
   [key: string]: unknown;
 };
 
@@ -33,6 +37,7 @@ export type Covenant = {
   baseline_review?: BaselineReview | null;
   pending_challenge?: string;
   challenge_count: number | string;
+  substantive_challenge_count?: number | string;
   last_challenge_at?: string;
   last_inspection?: InspectionReview | null;
   breach_challenge?: string;

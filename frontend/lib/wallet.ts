@@ -63,6 +63,23 @@ export async function ensureStudionet(): Promise<void> {
       }],
     });
   }
+  const confirmed = await provider.request({ method: "eth_chainId" });
+  if (typeof confirmed !== "string" || parseInt(confirmed, 16) !== CHAIN_ID) {
+    throw new Error("Wallet is not connected to GenLayer Studionet");
+  }
+}
+
+export async function currentWriteAccount(expectedAddress: string): Promise<string> {
+  await ensureStudionet();
+  const provider = injectedProvider();
+  if (!provider) throw new Error("No injected EIP-1193 wallet found");
+  const accounts = normalizeAccounts(await provider.request({ method: "eth_accounts" }));
+  if (!sameWallet(accounts[0], expectedAddress)) throw new Error("Wallet account changed; reconnect and retry");
+  const chain = await provider.request({ method: "eth_chainId" });
+  if (typeof chain !== "string" || parseInt(chain, 16) !== CHAIN_ID) {
+    throw new Error("Wallet is not connected to GenLayer Studionet");
+  }
+  return accounts[0];
 }
 
 type WalletState = {

@@ -12,11 +12,22 @@ import { StatusPill } from "@/components/StatusPill";
 export default function CovenantsPage() {
   const [items, setItems] = useState<Covenant[]>([]);
   const [error, setError] = useState("");
+  const [total, setTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("ALL");
   const configured = protocolConfigured();
 
-  useEffect(() => { if (!configured) return; listCovenants().then((x) => setItems(x.items)).catch((e) => setError(String(e?.message || e))); }, [configured]);
+  useEffect(() => { if (!configured) return; listCovenants().then((x) => { setItems(x.items); setTotal(Number(x.total)); }).catch((e) => setError(String(e?.message || e))); }, [configured]);
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      const page = await listCovenants(items.length, 24);
+      setItems((current) => [...current, ...page.items]);
+      setTotal(Number(page.total));
+    } catch (e) { setError(String((e as Error)?.message || e)); }
+    finally { setLoadingMore(false); }
+  }
   const filtered = useMemo(() => items.filter((c) => (filter === "ALL" || c.status === filter) && `${c.title} ${c.protected_promise}`.toLowerCase().includes(query.toLowerCase())), [items, filter, query]);
 
   return <section className="page-shell covenants-page">
@@ -33,5 +44,6 @@ export default function CovenantsPage() {
         <ArrowUpRight className="row-arrow"/>
       </Link></motion.div>)}
     </div>
+    {items.length < total && <button className="action-button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "Loading…" : `Load more (${items.length} of ${total})`}</button>}
   </section>;
 }

@@ -3,7 +3,7 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 import { TransactionHashVariant } from "genlayer-js/types";
-import { injectedProvider, RPC_URL } from "./wallet";
+import { currentWriteAccount, injectedProvider, RPC_URL } from "./wallet";
 import type { Challenge, Covenant, ProtocolStats } from "./types";
 
 export const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_REGISTRY_ADDRESS || "";
@@ -102,7 +102,8 @@ export async function getCredit(address: string, latest = false): Promise<string
 export async function findLatestCovenantByOwner(address: string, latest = false): Promise<string> { return read("find_latest_covenant_by_owner", [address], latest); }
 
 export async function submitWrite(address: string, functionName: string, args: unknown[] = [], value = 0n): Promise<string> {
-  const client = await writeClient(address);
+  const currentAddress = await currentWriteAccount(address);
+  const client = await writeClient(currentAddress);
   const hash = await withBudget(() => client.writeContract({ address: assertRegistry(), functionName, args, value } as any));
   cache.clear();
   return String(hash);

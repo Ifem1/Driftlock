@@ -1,7 +1,19 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import type { DecodedDeployData, GenLayerClient, TransactionHash } from "genlayer-js/types";
 import { TransactionStatus } from "genlayer-js/types";
+
+function git(...args: string[]): string {
+  return execFileSync("git", args, { encoding: "utf8" }).trim();
+}
+
+function sourceIdentity(file: string) {
+  const committed = git("rev-parse", `HEAD:${file}`);
+  const onDisk = git("hash-object", file);
+  if (committed !== onDisk) throw new Error(`Commit exact contract source before deployment: ${file}`);
+  return { path: file, gitBlob: committed };
+}
 
 async function deploy(client: GenLayerClient<any>, file: string, args: unknown[] = []) {
   const code = new Uint8Array(readFileSync(path.resolve(process.cwd(), file)));
@@ -24,6 +36,14 @@ async function deploy(client: GenLayerClient<any>, file: string, args: unknown[]
 export default async function main(client: GenLayerClient<any>) {
   const chainId = Number((client as any)?.chain?.id);
   if (chainId !== 61999) throw new Error(`Refusing deployment: Driftlock is locked to Studionet 61999, client is ${chainId}`);
+  const repositoryCommit = git("rev-parse", "HEAD");
+  const source = {
+    registry: sourceIdentity("contracts/drift_registry.py"),
+    inspector: sourceIdentity("contracts/source_inspector.py"),
+    judge: sourceIdentity("contracts/breach_judge.py"),
+  };
+  const cliVersion = JSON.parse(readFileSync(path.resolve(process.cwd(), "node_modules/genlayer/package.json"), "utf8")).version;
+  if (cliVersion !== "0.39.1") throw new Error(`Unexpected GenLayer CLI version: ${cliVersion}`);
   console.log("Driftlock deployment target: Studionet 61999 only");
 
   // Secure bootstrap: children authenticate one fixed Registry, then Registry binds them exactly once.
@@ -54,6 +74,10 @@ export default async function main(client: GenLayerClient<any>) {
     rpc: "https://studio.genlayer.com/api",
     explorer: "https://explorer-studio.genlayer.com",
     deployedAt: new Date().toISOString(),
+    repositoryCommit,
+    source,
+    genlayerCliVersion: cliVersion,
+    genvmVersion: "v0.2.12",
     contracts: { registry, inspector, judge, configureTxHash: String(configureHash) },
   };
   mkdirSync(path.resolve(process.cwd(), "deployments"), { recursive: true });

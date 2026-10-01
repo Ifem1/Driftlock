@@ -3,6 +3,7 @@
 from genlayer import *
 import json
 import re
+import hashlib
 from datetime import datetime, timezone
 
 VERSION = "0.1.0-studionet"
@@ -28,7 +29,7 @@ CHALLENGE_COOLDOWN = 900
 MIN_LIFETIME = 7200
 MAX_LIFETIME = 30 * 86400
 
-BASELINE_STATUSES = ("BASELINE_VERIFIED", "PROMISE_NOT_SUPPORTED", "SOURCE_UNAVAILABLE", "AMBIGUOUS")
+BASELINE_STATUSES = ("BASELINE_VERIFIED", "PROMISE_NOT_SUPPORTED", "BASELINE_ALREADY_BREACHED", "SOURCE_UNAVAILABLE", "AMBIGUOUS")
 INSPECTION_STATUSES = ("NO_RELEVANT_CHANGE", "MATERIAL_CHANGE", "SOURCE_UNAVAILABLE", "AMBIGUOUS")
 JUDGMENT_OUTCOMES = ("BREACH", "PERMITTED_CHANGE", "INCONCLUSIVE")
 TERMINAL_COVENANT = ("BREACHED", "EXPIRED_UNBREACHED", "BASELINE_REJECTED", "EXPIRED_UNVERIFIED")
@@ -247,7 +248,7 @@ class DriftRegistry(gl.Contract):
             "stake_atto": str(stake), "remaining_stake_atto": str(stake), "challenge_bond_atto": str(bond),
             "status": "BASELINE_PENDING", "created_at": _iso(), "activated_at": "", "expires_at": str(expiry),
             "baseline_deadline": str(now + BASELINE_TIMEOUT), "baseline_attempt": 1, "baseline_review": None,
-            "pending_challenge": "", "challenge_count": 0, "last_challenge_at": "0",
+            "pending_challenge": "", "challenge_count": 0, "substantive_challenge_count": 0, "last_challenge_at": "0",
             "last_inspection": None, "breach_challenge": "", "breached_at": "", "closed_at": "",
         }
         self._save_covenant(covenant)
@@ -313,6 +314,13 @@ class DriftRegistry(gl.Contract):
         status = result.get("status")
         if status not in BASELINE_STATUSES:
             raise gl.vm.UserError("[EXPECTED] unknown baseline status")
+        if status == "BASELINE_VERIFIED":
+            evidence = result.get("baseline_text")
+            if (not isinstance(evidence, str) or not evidence or len(evidence) > 16000
+                    or result.get("source_url") != covenant["canonical_url"]
+                    or result.get("baseline_digest") != hashlib.sha256(evidence.encode("utf-8")).hexdigest()
+                    or result.get("breach_condition_absent") is not True):
+                raise gl.vm.UserError("[EXPECTED] invalid verified baseline evidence")
         covenant["baseline_review"] = result
         if _now() >= int(covenant["expires_at"]):
             self._release_stake(covenant, covenant["owner"])
@@ -340,8 +348,8 @@ class DriftRegistry(gl.Contract):
         challenger = str(gl.message.sender_address)
         if challenger.lower() == covenant["owner"].lower():
             raise gl.vm.UserError("[EXPECTED] covenant owner cannot challenge their own covenant")
-        if int(covenant.get("challenge_count", 0)) >= MAX_CHALLENGES_PER_COVENANT:
-            raise gl.vm.UserError("[EXPECTED] covenant lifetime challenge limit reached")
+        if int(covenant.get("substantive_challenge_count", 0)) >= MAX_CHALLENGES_PER_COVENANT:
+            raise gl.vm.UserError("[EXPECTED] covenant substantive challenge limit reached")
         if now < int(covenant.get("last_challenge_at", "0")) + CHALLENGE_COOLDOWN:
             raise gl.vm.UserError("[EXPECTED] covenant challenge cooldown is active")
         if now + INSPECTION_TIMEOUT + JUDGE_TIMEOUT + 300 >= int(covenant["expires_at"]):
@@ -375,7 +383,8 @@ class DriftRegistry(gl.Contract):
         self.bond_escrow = u256(int(self.bond_escrow) + bond)
         gl.get_contract_at(Address(self.inspector_address)).emit(on="finalized").inspect_current(
             challenge_id, str(gl.message.contract_address), covenant["subject"], covenant["canonical_url"],
-            covenant["protected_promise"], covenant["breach_rule"], covenant["permitted_changes"]
+            covenant["protected_promise"], covenant["breach_rule"], covenant["permitted_changes"],
+            _json(covenant["baseline_review"])
         )
         return challenge_id
 
@@ -390,6 +399,10 @@ class DriftRegistry(gl.Contract):
         status = result.get("status")
         if status not in INSPECTION_STATUSES:
             raise gl.vm.UserError("[EXPECTED] unknown inspection status")
+        if (result.get("request_id") != challenge_id or result.get("kind") != "CURRENT"
+                or result.get("source_url") != covenant["canonical_url"]
+                or result.get("baseline_digest") != covenant["baseline_review"]["baseline_digest"]):
+            raise gl.vm.UserError("[EXPECTED] inspection callback identity mismatch")
         challenge["inspection"] = result
         covenant["last_inspection"] = result
 
@@ -400,6 +413,7 @@ class DriftRegistry(gl.Contract):
             self._clear_pending(covenant, challenge_id)
             covenant["last_challenge_at"] = str(_now())
         elif status == "NO_RELEVANT_CHANGE":
+            covenant["substantive_challenge_count"] = int(covenant.get("substantive_challenge_count", 0)) + 1
             challenge["status"] = "NO_RELEVANT_CHANGE"
             challenge["settled_at"] = _iso()
             self._release_bond(challenge, covenant["owner"])
@@ -437,6 +451,9 @@ class DriftRegistry(gl.Contract):
         outcome = result.get("outcome")
         if outcome not in JUDGMENT_OUTCOMES:
             raise gl.vm.UserError("[EXPECTED] unknown breach judgment")
+        if (result.get("request_id") != challenge_id
+                or result.get("inspection_digest") != hashlib.sha256(_json(challenge["inspection"]).encode("utf-8")).hexdigest()):
+            raise gl.vm.UserError("[EXPECTED] judgment callback identity mismatch")
         challenge["judgment"] = result
 
         if covenant["status"] != "ACTIVE" or _now() >= int(covenant["expires_at"]) or _now() >= int(challenge["stage_deadline"]):
@@ -446,6 +463,7 @@ class DriftRegistry(gl.Contract):
             self._clear_pending(covenant, challenge_id)
             covenant["last_challenge_at"] = str(_now())
         elif outcome == "PERMITTED_CHANGE":
+            covenant["substantive_challenge_count"] = int(covenant.get("substantive_challenge_count", 0)) + 1
             challenge["status"] = "PERMITTED_CHANGE"
             challenge["settled_at"] = _iso()
             self._release_bond(challenge, covenant["owner"])
@@ -462,6 +480,7 @@ class DriftRegistry(gl.Contract):
             if stake <= 0:
                 raise gl.vm.UserError("[EXPECTED] covenant stake already released")
             reward = stake * int(covenant["finder_reward_bps"]) // 10000
+            covenant["substantive_challenge_count"] = int(covenant.get("substantive_challenge_count", 0)) + 1
             beneficiary_amount = stake - reward
             self._release_bond(challenge, challenge["challenger"])
             self._release_stake(covenant, challenge["challenger"], reward)
@@ -521,6 +540,8 @@ class DriftRegistry(gl.Contract):
     @gl.public.write
     def withdraw_credit(self, recipient: str) -> None:
         recipient = _address(recipient, "credit recipient")
+        if recipient.lower() != str(gl.message.sender_address).lower():
+            raise gl.vm.UserError("[EXPECTED] only the credited wallet may withdraw")
         account = Address(recipient)
         amount = int(self.credits[account]) if account in self.credits else 0
         if amount <= 0:
@@ -538,7 +559,7 @@ class DriftRegistry(gl.Contract):
             covenant["status"] == "ACTIVE" and not covenant.get("pending_challenge")
             and now >= int(covenant.get("last_challenge_at", "0")) + CHALLENGE_COOLDOWN
             and now + INSPECTION_TIMEOUT + JUDGE_TIMEOUT + 300 < int(covenant["expires_at"])
-            and int(covenant.get("challenge_count", 0)) < MAX_CHALLENGES_PER_COVENANT
+            and int(covenant.get("substantive_challenge_count", 0)) < MAX_CHALLENGES_PER_COVENANT
         )
         covenant["can_expire"] = now >= int(covenant["expires_at"]) and covenant["status"] not in TERMINAL_COVENANT
         return covenant
@@ -561,7 +582,7 @@ class DriftRegistry(gl.Contract):
         fields = (
             "id", "title", "subject", "canonical_url", "protected_promise", "owner", "beneficiary",
             "stake_atto", "remaining_stake_atto", "challenge_bond_atto", "finder_reward_bps", "status",
-            "created_at", "activated_at", "expires_at", "pending_challenge", "challenge_count",
+            "created_at", "activated_at", "expires_at", "pending_challenge", "challenge_count", "substantive_challenge_count",
         )
         items = []
         for index in range(start, stop):

@@ -682,3 +682,149 @@ body{
     min-height:100svh;
   }
 }
+
+
+/* === HERO ATMOSPHERE + CONTRAST PASS === */
+/* Focused desktop hero refinement: brighter warm-ash headline, tighter composition,
+   and restrained ambient motion through the previously empty center field. */
+@media (min-width:961px){
+  .home-hero{
+    grid-template-rows:auto auto auto;
+    align-content:start;
+  }
+
+  .home-hero h1{
+    margin-bottom:0;
+  }
+
+  .hero-lower{
+    margin-top:clamp(38px,5.5vh,58px);
+  }
+}
+
+/* PUBLIC WORDS / YOUR AGREEMENT: keep the editorial ash, but restore contrast. */
+.home-hero h1 .hero-line{
+  color:#D2C7BC;
+  font-weight:400;
+  text-shadow:0 1px 0 rgba(255,255,255,.025),0 0 24px rgba(236,210,194,.035);
+}
+
+/* Keep the animated semantic accents distinct from the brighter base headline. */
+.home-hero h1 .hero-change{
+  color:#D9B4A2;
+}
+.home-hero h1 .hero-shouldnt{
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+}
+
+/* Hero-local motion: broad, blurred fields rather than particles or decorative cards. */
+.home-hero::before,
+.home-hero::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:1;
+  will-change:transform,opacity;
+}
+
+.home-hero::before{
+  width:64vw;
+  height:43vw;
+  min-width:760px;
+  min-height:500px;
+  right:-18vw;
+  top:22%;
+  border-radius:50%;
+  background:
+    conic-gradient(
+      from 214deg,
+      transparent 0deg 42deg,
+      rgba(226,85,42,.18) 76deg,
+      rgba(160,42,25,.08) 118deg,
+      transparent 164deg 236deg,
+      rgba(232,106,58,.12) 276deg,
+      transparent 330deg 360deg
+    );
+  filter:blur(54px) saturate(112%);
+  opacity:.48;
+  transform:rotate(-8deg) translate3d(0,0,0) scale(.96);
+  animation:heroAtmosphereOrbit 22s ease-in-out infinite alternate;
+}
+
+.home-hero::after{
+  width:58vw;
+  height:10vw;
+  min-height:120px;
+  left:12%;
+  top:54%;
+  border-radius:50%;
+  background:linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(118,29,20,.02) 18%,
+    rgba(232,91,46,.14) 50%,
+    rgba(155,40,24,.07) 72%,
+    transparent 100%
+  );
+  filter:blur(34px);
+  opacity:.52;
+  transform:rotate(-7deg) translate3d(-4vw,0,0);
+  animation:heroLightSweep 16s ease-in-out infinite alternate;
+}
+
+.atmosphere-grain{
+  animation:grainDrift 18s steps(6,end) infinite alternate;
+}
+
+@keyframes heroAtmosphereOrbit{
+  0%{
+    transform:rotate(-10deg) translate3d(-3vw,-1vh,0) scale(.94);
+    opacity:.38;
+  }
+  55%{opacity:.56}
+  100%{
+    transform:rotate(7deg) translate3d(5vw,4vh,0) scale(1.06);
+    opacity:.5;
+  }
+}
+
+@keyframes heroLightSweep{
+  0%{
+    transform:rotate(-8deg) translate3d(-8vw,-1vh,0) scale(.94);
+    opacity:.34;
+  }
+  100%{
+    transform:rotate(-3deg) translate3d(14vw,5vh,0) scale(1.06);
+    opacity:.58;
+  }
+}
+
+@keyframes grainDrift{
+  0%{transform:translate3d(-1.2%,0,0) rotate(7deg)}
+  100%{transform:translate3d(1.2%,-.8%,0) rotate(7.35deg)}
+}
+
+@media (max-width:960px){
+  .home-hero::before{
+    min-width:620px;
+    min-height:430px;
+    right:-45vw;
+    top:25%;
+    opacity:.36;
+  }
+  .home-hero::after{
+    width:82vw;
+    left:4%;
+    top:58%;
+    opacity:.34;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .home-hero::before,
+  .home-hero::after,
+  .atmosphere-grain{
+    animation:none!important;
+  }
+}

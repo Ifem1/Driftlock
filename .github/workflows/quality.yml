@@ -1,0 +1,47 @@
+name: quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Pin GenVM runtime
+        run: echo "GENVM_VERSION=v0.2.12" >> "$GITHUB_ENV"
+      - run: genvm-lint check contracts/drift_registry.py --json
+      - run: genvm-lint check contracts/source_inspector.py --json
+      - run: genvm-lint check contracts/breach_judge.py --json
+      - run: pytest tests/direct/ -v
+
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: test "$(./node_modules/.bin/genlayer --version)" = "0.39.1"
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run test
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build

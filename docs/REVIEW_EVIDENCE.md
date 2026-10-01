@@ -1,26 +1,19 @@
 # Review evidence
 
-This file intentionally contains no invented live evidence.
+## Audited behavior
 
-## Repository evidence
+- baseline source text is bounded, hashed, and passed as evidence into same-URL current inspection;
+- byte-identical source content resolves deterministically to `NO_RELEVANT_CHANGE`;
+- callback identities and inspection digests are bound to covenant and challenge state;
+- only substantive outcomes consume the 24-challenge cap; cooldown still applies to all attempts;
+- self-only pull withdrawals and explicit accounting conservation;
+- frontend rechecks Studionet chain and selected account immediately before each write;
+- covenant list pagination is bounded; detail view exposes stored baseline and current evidence;
+- CI runs GenVM/Direct Mode contract validation and frontend checks.
 
-- semantic responsibilities are split across three contracts;
-- source URLs are HTTPS-only and bounded;
-- source render text is bounded;
-- component callers are authenticated;
-- covenant history is lifetime-bounded and reads are paginated;
-- challenge spam is cooldown-gated;
-- deterministic accounting exposes a conservation invariant;
-- frontend has no application backend and uses injected EIP-1193 only;
-- CI checks contracts and frontend.
+## Release evidence
 
-## Verified release evidence
-
-- Commit `fbd1f3708f6c231e982a9076f6992173ec81ca3b` passed GitHub Actions run `36881540734` (contracts, frontend and CLI jobs).
-- All three Studionet deployment receipts and the one-time binding receipt returned `FINALIZED`; exact hashes and addresses are in `deployments/studionet.json` and `docs/LIVE_VALIDATION.md`.
-- On-chain schemas matched the expected Registry, Inspector and Judge methods. Registry stats confirmed binding and balanced zero-state accounting.
-- Vercel production deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY. Public access and manual browser paths remain unverified because Vercel SSO protection is enabled.
-
-## Live covenant evidence
-
-**Pending.** No covenant, challenge, credit or withdrawal result is claimed here.
+- Corrected contract release is deployed to Studionet; source commit and Git blob hashes are recorded in `deployments/studionet.json`.
+- GitHub Actions quality run `36928565791` passed for source commit `7048cefa430fbde3fbfca8f125ec58d94a540eb8`.
+- Live three-wallet proof includes an unchanged challenge, material source change, breach judgment, finalized withdrawals, and balanced final accounting. Transaction-level evidence is in `deployments/live-proof.json` and summarized in `docs/LIVE_VALIDATION.md`.
+- Vercel production deployment `dpl_ECcrqpiusSWAvvT72YBnnoM68Dda` is READY at `https://driftlock-nine.vercel.app`. The index/detail read path was browser-checked without console errors. The in-app browser had no injected wallet, so browser transaction flows remain unverified.

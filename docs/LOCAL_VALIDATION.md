@@ -1,38 +1,37 @@
-# Local validation performed in the build workspace
+# Local validation
 
-Completed before packaging:
+Verified in the repository workspace on 2026-10-01. Python was 3.12.10, the local Node.js runtime was 24.16.0, GenLayer CLI was 0.39.1, and GenVM was pinned to v0.2.12. CI separately runs Node 22 as configured in `.github/workflows/quality.yml`.
 
-- Python syntax compilation: PASS for all contracts and Direct Mode test files.
-- TypeScript/TSX parser pass: PASS, 22 source/test files, zero parse diagnostics.
-- Direct Mode test definitions present: 23.
-- Frontend unit test cases present: 6.
-- Repository scan: no CRUX references and no internal guide references.
-- Network safety scan: no `61997`, `studio-dev`, or `0.40.0` references; project is pinned/documented for Studionet `61999`.
-- Architecture scan: no application API routes, Server Actions, database integration, WalletConnect, Privy or Snaps implementation.
+## Results
 
-Not executable in this workspace because outbound package-registry access is unavailable:
+- `python -m pytest tests/direct/ -v`: **41 passed**.
+- `genvm-lint check` for Registry, Inspector and Judge with `GENVM_VERSION=v0.2.12`: **all PASS**, including SDK validation.
+- `npm ci`: **PASS**.
+- `npm --prefix frontend ci`: **PASS**.
+- Frontend Vitest: **9 passed** across 2 files.
+- TypeScript typecheck: **PASS**.
+- ESLint: **PASS**.
+- Next.js production build: **PASS**.
+- `git diff --check`: **PASS**.
+- GitHub Actions quality run for commit `7048cefa430fbde3fbfca8f125ec58d94a540eb8`: **success** ([run 36928565791](https://github.com/Ifem1/Driftlock/actions/runs/36928565791)).
 
-- dependency installation from PyPI/npm;
-- `genvm-lint`;
-- Direct Mode runtime execution;
-- Vitest execution;
-- TypeScript semantic typecheck against installed package types;
-- ESLint;
-- Next.js production build;
-- live browser verification.
+The tests cover bounded baseline evidence, unchanged and changed source, an already-breached baseline, evidence disagreement and tampering, callback replay, challenge-cap exhaustion resistance, withdrawal authorization, and wallet network/account preconditions. The Direct Mode lifecycle test suite manually supplies Registry callbacks in several Registry tests; it does not replace live Studionet proof. The live proof is documented separately in `LIVE_VALIDATION.md`.
 
-Those are mandatory first gates in `CODEX_HANDOFF.md`. Do not convert this static validation into a claim that runtime/CI passed.
+## Reproduction
 
-## Verification in this workspace on 2026-10-01
+```powershell
+$env:GENVM_VERSION="v0.2.12"
+python -m pytest tests/direct/ -v
+genvm-lint check contracts/drift_registry.py --json
+genvm-lint check contracts/source_inspector.py --json
+genvm-lint check contracts/breach_judge.py --json
+npm ci
+./node_modules/.bin/genlayer --version
+npm --prefix frontend ci
+npm --prefix frontend run test
+npm --prefix frontend run typecheck
+npm --prefix frontend run lint
+npm --prefix frontend run build
+```
 
-- Repository-local GenLayer CLI: `0.39.1`.
-- Configured network: `studionet`, chain `61999`, RPC `https://studio.genlayer.com/api`.
-- GenVM pin: `v0.2.12`.
-- `genvm-lint check --json`: PASS for all three contracts.
-- `pytest tests/direct/ -q`: 30 passed.
-- `npm run test --prefix frontend`: 6 passed.
-- `npm run typecheck --prefix frontend`: PASS.
-- `npm run lint --prefix frontend`: PASS.
-- `npm run build --prefix frontend`: PASS, Next.js 15.5.27.
-
-These are local results. GitHub Actions, deployment, consensus finality and production browser behaviour remain unverified.
+Live Studionet settings: chain ID `61999`, RPC `https://studio.genlayer.com/api`, explorer `https://explorer-studio.genlayer.com`. Local checks and the CI run do not claim browser-wallet testing.

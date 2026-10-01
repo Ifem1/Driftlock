@@ -68,7 +68,7 @@ The UI does not fabricate live state when contracts are not configured. Producti
 - covenant owner cannot challenge their own covenant;
 - challengers cannot supply alternate evidence URLs;
 - only one challenge may be pending per covenant;
-- a covenant has a hard lifetime challenge cap;
+- substantive challenge outcomes have a cap of 24; refunded uncertainty attempts preserve that capacity and remain cooldown-gated;
 - source failure / ambiguity / inconclusive judgment cannot create a breach;
 - late callbacks cannot re-settle closed state;
 - protocol settlement uses pull credits;
@@ -105,7 +105,7 @@ npm run dev
 
 ## Deployment
 
-Final release deployment is Studionet `61999` only. Before any write, verify the repository-local CLI release, configured network and RPC. `deploy/deployDriftlock.ts` also refuses a client whose chain ID is not `61999`.
+The corrected release is deployed to Studionet `61999`. `deploy/deployDriftlock.ts` refuses another chain, checks that the on-disk contract files exactly match committed Git blobs, waits for each transaction to finalize and records source commit/blob identities in `deployments/studionet.json`.
 
 The intended bootstrap order is:
 
@@ -117,9 +117,9 @@ The intended bootstrap order is:
 
 Do not treat a transaction hash as proof of finality. Submission evidence must distinguish submitted, accepted and finalized state.
 
-## Live proof plan
+## Live proof
 
-`demo-source/public-promise.txt` is provided as the transparent same-URL demo source. Final deployment should record a two-wallet sequence:
+`demo-source/public-promise.txt` is the transparent same-URL demo source. The live record in `deployments/live-proof.json` documents a three-wallet sequence (owner, challenger and beneficiary):
 
 1. create covenant and obtain `BASELINE_VERIFIED`;
 2. challenge unchanged source and obtain `NO_RELEVANT_CHANGE`;
@@ -128,6 +128,6 @@ Do not treat a transaction hash as proof of finality. Submission evidence must d
 5. verify finder/beneficiary credits and withdrawals;
 6. confirm accounting remains balanced.
 
-No transaction hashes or live verdicts are pre-filled in this starter. They must be produced and independently checked during the real run.
+The live proof reached `BASELINE_VERIFIED`, `NO_RELEVANT_CHANGE`, `MATERIAL_CHANGE`, and `BREACH` at the same URL. Finder and beneficiary credits were withdrawn, and final on-chain accounting is balanced. Full finalized evidence, including transaction hashes and source commits, is recorded in `deployments/live-proof.json` and `docs/LIVE_VALIDATION.md`.
 
-See `CODEX_HANDOFF.md` for the exact remaining handoff work.
+The production site is deployed at [driftlock-nine.vercel.app](https://driftlock-nine.vercel.app). Its read-only covenant pages were checked in a browser. Browser wallet transaction flows require an injected EIP-1193 wallet and were not exercised in the in-app browser; contract transactions were verified separately on Studionet using three distinct local test wallets.

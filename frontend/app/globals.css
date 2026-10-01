@@ -828,3 +828,145 @@ body{
     animation:none!important;
   }
 }
+
+
+/* === COMPACT DESKTOP / 100% BROWSER FIT === */
+/*
+  On Windows/high-DPI laptop setups a 1366px physical screen can expose only
+  ~1024 CSS px at Chrome 100%. The previous desktop composition kept 500px
+  documents and full-size story type in that range, so the sticky scene only
+  looked complete after manually zooming Chrome to ~75%.
+
+  Keep native browser zoom at 100% and compact the actual layout instead.
+  This deliberately avoids CSS zoom/transform scaling so sticky positioning,
+  scroll progress, hit targets, and mobile behavior keep normal coordinates.
+*/
+@media (min-width:961px) and (max-width:1180px){
+  .site-header{height:52px}
+  .site-header-inner{
+    height:52px;
+    padding:0 18px;
+    gap:14px;
+  }
+  .brand{font-size:10px}
+  .desktop-nav{gap:18px;font-size:10px}
+  .network-label{font-size:7px}
+  .wallet-control{padding:8px 12px;font-size:10px}
+  .wallet-address{padding:7px 10px;font-size:9px}
+  .wallet-disconnect{width:30px;height:30px}
+
+  .home-hero{
+    min-height:100svh;
+    padding:72px 4vw 24px;
+  }
+  .home-hero h1{
+    font-size:clamp(40px,4.25vw,58px);
+    line-height:.92;
+    margin:clamp(20px,2.5vh,28px) 0 0;
+    max-width:820px;
+  }
+  .hero-lower{
+    margin-top:clamp(28px,4vh,40px);
+    grid-template-columns:minmax(260px,430px) auto auto;
+    gap:16px;
+    padding-top:14px;
+  }
+  .hero-lower p{font-size:12px;line-height:1.5}
+  .cta{min-height:38px;padding:0 13px;font-size:10px}
+
+  .story-sticky{
+    grid-template-columns:.82fr 1.18fr;
+    gap:3.5vw;
+    padding:62px 4vw 20px;
+    align-items:center;
+  }
+  .story-copy .mono-label{font-size:8px}
+  .story-copy h2{
+    font-size:clamp(34px,3.85vw,46px);
+    line-height:.94;
+    letter-spacing:-.052em;
+    margin:12px 0 14px;
+  }
+  .story-copy>p{
+    max-width:440px;
+    font-size:11px;
+    line-height:1.55;
+  }
+  .story-states{
+    gap:4px;
+    margin-top:18px;
+    font-size:8px;
+  }
+  .story-states span{padding:3px 0 3px 9px}
+
+  .document-stage{
+    height:410px;
+    perspective:1200px;
+  }
+  .document-card{
+    width:min(380px,88%);
+    min-height:292px;
+    padding:16px 18px;
+  }
+  .baseline-doc{top:30px}
+  .current-doc{bottom:10px}
+  .doc-top{font-size:8px;padding-bottom:9px}
+  .doc-lines{
+    gap:6px;
+    margin:27px 0 17px;
+  }
+  .document-card blockquote{
+    font-size:clamp(18px,1.7vw,22px);
+    line-height:1.15;
+  }
+  .doc-foot{
+    margin-top:28px;
+    padding-top:9px;
+    font-size:8px;
+  }
+  .change-mark{
+    margin-top:27px;
+    padding-top:9px;
+    font-size:8px;
+  }
+  .breach-stamp{
+    right:7%;
+    top:39%;
+    padding:8px 11px;
+    font-size:12px;
+    border-width:1px;
+  }
+}
+
+/* True short-height desktop windows need the same information density even
+   when their CSS width is wider than the compact-laptop range. */
+@media (min-width:1181px) and (max-height:700px){
+  .site-header{height:56px}
+  .site-header-inner{height:56px}
+
+  .story-sticky{
+    padding-top:64px;
+    padding-bottom:18px;
+    gap:4vw;
+  }
+  .story-copy h2{
+    font-size:clamp(36px,4vw,54px);
+    margin:13px 0 15px;
+  }
+  .story-copy>p{font-size:12px;line-height:1.55}
+  .story-states{margin-top:19px;gap:4px}
+
+  .document-stage{height:430px}
+  .document-card{
+    width:min(420px,86%);
+    min-height:305px;
+    padding:17px 19px;
+  }
+  .baseline-doc{top:30px}
+  .current-doc{bottom:10px}
+  .doc-lines{margin:29px 0 18px;gap:7px}
+  .document-card blockquote{font-size:clamp(19px,1.6vw,25px)}
+  .doc-foot{margin-top:30px}
+  .change-mark{margin-top:29px}
+  .breach-stamp{font-size:13px;padding:8px 12px}
+}

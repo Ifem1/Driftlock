@@ -28,7 +28,9 @@ Full chain readbacks and results are in [`deployments/live-proof.json`](../deplo
 
 ## Production frontend
 
-Vercel deployment `dpl_ECcrqpiusSWAvvT72YBnnoM68Dda` reached `READY` at [https://driftlock-nine.vercel.app](https://driftlock-nine.vercel.app). The covenant index and detail were manually opened. The detail showed the on-chain verified baseline and current inspection. Browser console had no errors or warnings. The in-app browser had no injected wallet, so browser transaction flows and responsive wallet interactions were not exercised; contract execution was checked independently with three distinct local test wallets.
+Production was restored from canonical `main` commit `8a8a805364cfc9ede797732af88fa51627fd6c89` using the Vercel CLI (not Git integration). Deployment `dpl_1a4YbdnGCXt6y51ECYkpoisznhky` reached `READY` at [https://driftlock-c0zgttaep-ifem1s-projects.vercel.app](https://driftlock-c0zgttaep-ifem1s-projects.vercel.app). Vercel's deployment inspection lists `driftlock-nine.vercel.app` as its alias, and the alias returned HTTP 200. This production deployment contains the approved `main` frontend; the audit branch was not deployed to Production. The covenant index and detail were manually opened on the earlier production build. The in-app browser had no injected wallet, so browser transaction flows and responsive wallet interactions were not exercised; contract execution was checked independently with three distinct local test wallets.
+
+The Vercel CLI project inspection did not expose its configured Production Branch setting, so that setting could not be independently confirmed. The production deployment itself was created directly from the verified canonical `main` checkout.
 
 ## CI and local verification
 

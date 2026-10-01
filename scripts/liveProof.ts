@@ -73,13 +73,13 @@ async function pollChallenge(id: string, attempts = 100) {
 }
 
 async function main() {
-  const owner = await account(ownerName);
-  const challenger = await account(challengerName);
-  const beneficiary = await account(beneficiaryName);
-  if (new Set([owner.address, challenger.address, beneficiary.address].map((x) => x.toLowerCase())).size !== 3) {
-    throw new Error("Proof wallets must be distinct");
-  }
   if (phase === "create") {
+    const owner = await account(ownerName);
+    const challenger = await account(challengerName);
+    const beneficiary = await account(beneficiaryName);
+    if (new Set([owner.address, challenger.address, beneficiary.address].map((x) => x.toLowerCase())).size !== 3) {
+      throw new Error("Proof wallets must be distinct");
+    }
     const expires = BigInt(Math.floor(Date.now() / 1000) + 2 * 86400);
     const hash = await send(owner, "create_covenant", [
       "Public customer-data promise", "The current customer-data policy of Driftlock Demo Company.", sourceUrl,
@@ -101,9 +101,9 @@ async function main() {
     const covenant = await read("get_covenant", [id]);
     const challenge = await read("get_challenge", [proof.changed.challengeId]);
     const credits = {
-      owner: await read("get_credit", [owner.address]),
-      challenger: await read("get_credit", [challenger.address]),
-      beneficiary: await read("get_credit", [beneficiary.address]),
+      owner: await read("get_credit", [proof.owner]),
+      challenger: await read("get_credit", [proof.challenger]),
+      beneficiary: await read("get_credit", [proof.beneficiary]),
     };
     const stats = await read("get_stats");
     const verification = { covenantStatus: covenant.status, remainingStake: covenant.remaining_stake_atto,
@@ -111,6 +111,12 @@ async function main() {
     save({ finalVerification: verification });
     console.log(JSON.stringify(verification, null, 2));
     return;
+  }
+  const owner = await account(ownerName);
+  const challenger = await account(challengerName);
+  const beneficiary = await account(beneficiaryName);
+  if (new Set([owner.address, challenger.address, beneficiary.address].map((x) => x.toLowerCase())).size !== 3) {
+    throw new Error("Proof wallets must be distinct");
   }
   if (phase === "challenge-unchanged" || phase === "challenge-changed") {
     const covenant = await read("get_covenant", [id]);

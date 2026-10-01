@@ -149,5 +149,69 @@
     "total_deposited_atto": "10200000000000000",
     "version": "0.1.0-studionet",
     "withdrawn_atto": "10200000000000000"
+  },
+  "finalVerification": {
+    "covenantStatus": "BREACHED",
+    "remainingStake": "0",
+    "challengeStatus": "BREACH",
+    "inspection": {
+      "baseline_digest": "cb713d95689489779a48b35cd0dce6117a0316821948ce055639fd96c0a98f25",
+      "basis": "The current text explicitly permits the commercial licensing and transfer of customer information to third parties, which directly contradicts the protected promise and matches the breach rule. The change is stated as effective immediately.",
+      "current_digest": "0e3cb47b27fde144d955ff6ffa3a71c5e3fa99198e00b5ee1675bd9ae698a21a",
+      "current_excerpt": "DRIFTLOCK DEMO COMPANY POLICY\n\nCustomer information may be commercially licensed and transferred to third-party advertising partners, effective immediately.\n\nThis file is intentionally simple so a reviewer can inspect a before/after public promise at one stable URL during the live Studionet demonstration.\n",
+      "effective_now": true,
+      "kind": "CURRENT",
+      "new_conflicting_term": true,
+      "promise_still_supported": false,
+      "provenance": "GENLAYER_INDEPENDENT_SOURCE_REPLAY",
+      "recorded_at": "2026-10-01T21:39:36+00:00",
+      "relevant_change_detected": true,
+      "request_id": "dc-2",
+      "same_subject": true,
+      "source_accessible": true,
+      "source_url": "https://raw.githubusercontent.com/Ifem1/Driftlock/codex/audit-fix/demo-source/public-promise.txt",
+      "status": "MATERIAL_CHANGE"
+    },
+    "judgment": {
+      "basis": "The current source affirmatively states that customer information may be commercially licensed and transferred to third-party advertising partners, effective immediately. That conduct falls within the breach rule's prohibition on sale, commercial licensing, or commercial transfer of customer information to third parties. The statement concerns the current customer-data policy of Driftlock Demo Company, is operative now, and is not a permitted formatting, typography, or unrelated clarification change.",
+      "breach_supported": true,
+      "effective_now": true,
+      "inspection_digest": "8edaed9c968bf20dee3c15f620749f676abaa1c00e7fcf848cd17b216643ef4b",
+      "outcome": "BREACH",
+      "permitted_by_rule": false,
+      "provenance": "GENLAYER_INDEPENDENT_BREACH_REPLAY",
+      "recorded_at": "2026-10-01T21:40:51+00:00",
+      "request_id": "dc-2",
+      "same_subject": true
+    },
+    "credits": {
+      "owner": "0",
+      "challenger": "0",
+      "beneficiary": "0"
+    },
+    "stats": {
+      "accounting_balanced": true,
+      "admin_controls": false,
+      "bond_escrow_atto": "0",
+      "chain_id": "61999",
+      "claimable_atto": "0",
+      "components_configured": true,
+      "covenants_activated": "1",
+      "covenants_breached": "1",
+      "covenants_expired": "0",
+      "inspector": "0x61BFdBDd25130B7C718964D9538cBCE92Dcc6057",
+      "judge": "0x2a7f6617b3c018327aA3344A85A91455550E757C",
+      "max_challenges_per_covenant": "24",
+      "network": "StudioNet",
+      "product": "Driftlock",
+      "protocol_fee_bps": "0",
+      "rpc": "https://studio.genlayer.com/api",
+      "stake_escrow_atto": "0",
+      "total_challenges": "2",
+      "total_covenants": "1",
+      "total_deposited_atto": "10200000000000000",
+      "version": "0.1.0-studionet",
+      "withdrawn_atto": "10200000000000000"
+    }
   }
 }

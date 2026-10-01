@@ -14,7 +14,13 @@ const stages = [
 export function HomeExperience() {
   const reduce = useReducedMotion();
   const story = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
   const { scrollYProgress } = useScroll({ target: story, offset: ["start start", "end end"] });
+  const heroKickerY = useTransform(scrollY, [0, 600], reduce ? [0, 0] : [0, -3]);
+  const heroHeadingY = useTransform(scrollY, [0, 600], reduce ? [0, 0] : [0, -6]);
+  const heroLowerY = useTransform(scrollY, [0, 600], reduce ? [0, 0] : [0, -4]);
+  const heroGlowY = useTransform(scrollY, [0, 700], reduce ? [0, 0] : [0, 18]);
+  const heroGlowX = useTransform(scrollY, [0, 700], reduce ? [0, 0] : [0, -8]);
   const currentY = useTransform(scrollYProgress, [0.14, 0.48, 0.78], reduce ? [0, 0, 0] : [76, 4, -30]);
   const currentX = useTransform(scrollYProgress, [0.18, 0.6], reduce ? [0, 0] : [18, -8]);
   const baselineOpacity = useTransform(scrollYProgress, [0, .16, .72], [.5, 1, 1]);
@@ -24,8 +30,9 @@ export function HomeExperience() {
 
   return <>
     <section className="home-hero">
-      <div className="hero-kicker"><span>GENLAYER / STAKE-BACKED COVENANTS</span><span>01 — 04</span></div>
-      <h1 aria-label="Public words change. Your agreement shouldn't.">
+      <motion.div className="hero-parallax-glow" style={{ y: heroGlowY, x: heroGlowX }} aria-hidden="true"/>
+      <motion.div className="hero-kicker" style={{ y: heroKickerY }}><span>GENLAYER / STAKE-BACKED COVENANTS</span><span>01 — 04</span></motion.div>
+      <motion.h1 style={{ y: heroHeadingY }} aria-label="Public words change. Your agreement shouldn't.">
         <span className="hero-line-mask">
           <motion.span
             className="hero-line"
@@ -36,8 +43,8 @@ export function HomeExperience() {
             PUBLIC WORDS{" "}
             <motion.span
               className="hero-change"
-              animate={reduce ? undefined : { y: [0, -2, 0], opacity: [.62, .9, .62] }}
-              transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
+              animate={reduce ? undefined : { y: [0, -3, 1, 0], opacity: [.68, 1, .78, .68] }}
+              transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
             >CHANGE.</motion.span>
           </motion.span>
         </span>
@@ -52,12 +59,12 @@ export function HomeExperience() {
             <motion.em
               className="hero-shouldnt"
               animate={reduce ? undefined : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-              transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 7.5, repeat: Infinity, ease: "linear" }}
             >SHOULDN&apos;T.</motion.em>
           </motion.span>
         </span>
-      </h1>
-      <div className="hero-lower">
+      </motion.h1>
+      <motion.div className="hero-lower" style={{ y: heroLowerY }}>
         <motion.p initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: reduce ? 0 : .38, duration: .62 }}>
           Lock an already-verifiable public promise behind GEN. If that same source materially changes later, GenLayer independently determines whether the covenant was breached.
         </motion.p>
@@ -66,7 +73,7 @@ export function HomeExperience() {
           <Link href="/covenants" className="cta ghost">Watch live covenants</Link>
         </motion.div>
         <div className="scroll-cue"><ArrowDownRight size={18}/><span>Scroll to inspect the protocol</span></div>
-      </div>
+      </motion.div>
     </section>
 
     <section className="story-shell" ref={story}>

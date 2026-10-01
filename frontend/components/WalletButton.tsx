@@ -44,7 +44,7 @@ export function WalletButton() {
   return <div className="wallet-wrap">
     <div className="wallet-cluster">
       <button className="wallet-address" onClick={() => void copyAddress()} aria-label="Copy connected wallet address" title="Copy full address">
-        <span className="wallet-status-dot"/><span>{shorten(wallet.address)}</span>{copied ? <Check size={12}/> : <Copy size={12}/>}
+        <span className="wallet-status-dot"/><span>{shorten(wallet.address)}</span>{copied ? <Check size={13}/> : <Copy size={13}/>}<span className="wallet-copy-label">{copied ? "Check" : "Copy"}</span>
       </button>
       <button className="wallet-disconnect" onClick={wallet.disconnect} aria-label="Disconnect wallet" title="Disconnect wallet"><Unplug size={14}/></button>
     </div>

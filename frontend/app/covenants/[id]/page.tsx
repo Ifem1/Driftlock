@@ -46,11 +46,10 @@ export default function CovenantDetailPage() {
     if (!covenant || !wallet.address) return;
     setBusy(true); setTx("");
     try {
-      if (!wallet.correctNetwork) await wallet.switchNetwork();
       const hash = await submitWrite(wallet.address, "challenge_covenant", [covenant.id], BigInt(covenant.challenge_bond_atto));
       setTx(hash); toast("Challenge submitted", { description: "Waiting for GenLayer finality." });
       await waitForFinalization(hash);
-      toast.success("Challenge finalized");
+      toast.success("Challenge transaction finalized. Source inspection is processing.");
       await refresh(true);
     } catch (e) { toast.error(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }

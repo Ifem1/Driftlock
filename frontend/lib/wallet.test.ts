@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { CHAIN_HEX, CHAIN_ID, copyWalletAddress, isStudionetChain, normalizeAccounts, sameWallet } from "./wallet";
+import { describe, expect, it, vi } from "vitest";
+import { CHAIN_HEX, CHAIN_ID, copyWalletAddress, ensureStudionet, isStudionetChain, normalizeAccounts, sameWallet } from "./wallet";
 
 describe("wallet helpers", () => {
   it("pins the stable Studionet chain", () => {
@@ -30,5 +30,23 @@ describe("wallet helpers", () => {
 
   it("fails clearly when clipboard access is unavailable", async () => {
     await expect(copyWalletAddress("0xAbCd", null)).rejects.toThrow("Clipboard is not available");
+  });
+
+  it("confirms the injected wallet switched to Studionet", async () => {
+    let chain = "0x1";
+    const request = vi.fn(async ({ method }: { method: string }) => {
+      if (method === "eth_chainId") return chain;
+      if (method === "wallet_switchEthereumChain") { chain = CHAIN_HEX; return null; }
+      throw new Error(method);
+    });
+    vi.stubGlobal("window", { ethereum: { request } });
+    await expect(ensureStudionet()).resolves.toBeUndefined();
+    expect(request).toHaveBeenCalledTimes(3);
+  });
+
+  it("blocks writes when the wallet refuses the Studionet switch", async () => {
+    const request = vi.fn(async ({ method }: { method: string }) => method === "eth_chainId" ? "0x1" : null);
+    vi.stubGlobal("window", { ethereum: { request } });
+    await expect(ensureStudionet()).rejects.toThrow("Wallet is not connected to GenLayer Studionet");
   });
 });

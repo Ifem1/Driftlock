@@ -16,14 +16,16 @@ Registry only accepts callbacks for the expected challenge stage. Closed/expired
 
 Stake and challenge bonds enter explicit escrow totals. Settlement moves values from escrow into claimable credits. `withdraw_credit` moves claimable value into the withdrawn total before emitting the transfer. `get_stats().accounting_balanced` exposes the conservation check.
 
-## Known pre-deployment work
-
 ## October 2026 source audit
 
 The Registry's baseline callback originally identified only a covenant. A finalized callback from attempt 1 could arrive after the owner started attempt 2 and activate the covenant using stale evidence. The Inspector now passes its request ID to the Registry, which checks it against the current attempt and the result packet. A Direct Mode regression test covers this ordering.
 
-The source audit also checked component sender authentication, single binding, stage deadlines, duplicate callbacks, expiry races, cooldown and lifetime cap, escrow conservation, withdrawal ordering, source text bounds, prompt injection instructions, structured semantic response checks, and validator replay. The 30 Direct Mode tests passed locally with GenVM v0.2.12. These tests do not prove production consensus behaviour or deployed bytecode.
+The source audit also checked component sender authentication, single binding, stage deadlines, duplicate callbacks, expiry races, cooldown and lifetime cap, escrow conservation, withdrawal ordering, source text bounds, prompt injection instructions, structured semantic response checks, and validator replay. CI passed the 30 Direct Mode tests with GenVM v0.2.12. These tests do not prove every production consensus outcome.
 
 The frontend dependency audit found a vulnerable Next.js 15.5.7 pin. It was updated to 15.5.27. npm still reports transitive PostCSS and Sharp advisories through Next.js 15.5.27; resolving them may require a framework major upgrade and compatibility review. Do not treat the frontend as free of dependency advisories.
 
-The final Studionet deployment, on-chain schema verification, two-wallet proof, and production browser audit remain necessary before release can be called complete.
+The Studionet deployment and production frontend are live. The owner reports manually verifying the injected-wallet browser paths. CI does not automate wallet interaction. See `LIVE_VALIDATION.md` for deployment receipts and evidence limits.
+
+## Source evidence retention
+
+The baseline stores bounded verified source text and its digest. For later checks, GenLayer validators independently re-evaluate the covenant against the same frozen canonical URL. The contracts do not archive a permanent historical snapshot or diff of every fetched page; documentation and reviewer copy should not imply otherwise.

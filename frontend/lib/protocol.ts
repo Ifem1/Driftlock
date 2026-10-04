@@ -2,8 +2,8 @@
 
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
-import { TransactionHashVariant } from "genlayer-js/types";
-import { injectedProvider, RPC_URL } from "./wallet";
+import { ExecutionResult, TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
+import { ensureStudionet, injectedProvider, RPC_URL } from "./wallet";
 import type { Challenge, Covenant, ProtocolStats } from "./types";
 
 export const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_REGISTRY_ADDRESS || "";
@@ -102,6 +102,7 @@ export async function getCredit(address: string, latest = false): Promise<string
 export async function findLatestCovenantByOwner(address: string, latest = false): Promise<string> { return read("find_latest_covenant_by_owner", [address], latest); }
 
 export async function submitWrite(address: string, functionName: string, args: unknown[] = [], value = 0n): Promise<string> {
+  await ensureStudionet();
   const client = await writeClient(address);
   const hash = await withBudget(() => client.writeContract({ address: assertRegistry(), functionName, args, value } as any));
   cache.clear();
@@ -109,5 +110,18 @@ export async function submitWrite(address: string, functionName: string, args: u
 }
 
 export async function waitForFinalization(hash: string): Promise<unknown> {
-  return readClient().waitForTransactionReceipt({ hash: hash as any, status: "FINALIZED" as any, retries: 240, interval: 15_000 });
+  const receipt = await readClient().waitForTransactionReceipt({ hash: hash as any, status: TransactionStatus.FINALIZED, retries: 240, interval: 15_000 });
+  assertSuccessfulExecution(receipt, hash);
+  return receipt;
+}
+
+export function assertSuccessfulExecution(receipt: any, hash = "transaction"): void {
+  if (receipt?.statusName !== TransactionStatus.FINALIZED) {
+    throw new Error(`${hash} did not finalize (status: ${receipt?.statusName ?? receipt?.status ?? "unknown"}).`);
+  }
+  if (receipt?.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
+    const execution = receipt?.txExecutionResultName ?? receipt?.txExecutionResult ?? "unknown";
+    const reason = receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
+    throw new Error(`${hash} finalized but contract execution failed (${execution})${reason ? `: ${reason}` : "."}`);
+  }
 }

@@ -1,6 +1,6 @@
 # Live validation
 
-Status: **DEPLOYMENT VERIFIED; TWO-WALLET PROOF PENDING**
+Status: **STUDIONET DEPLOYMENT VERIFIED; OWNER-REPORTED BROWSER WALLET VERIFICATION COMPLETE**
 
 ## Verified deployment on Studionet 61999
 
@@ -14,24 +14,10 @@ Deployed 2026-10-01 with repository-local GenLayer CLI `0.39.1` and GenVM pin `v
 
 One-time component binding finalized in `0xd3498a192d0548cbc4e695657a22a4f338b1deb72051b0af9104d81dbf153d3c`. All four receipts independently returned `status_name: FINALIZED`. The three deployed schemas were read back. Registry `get_stats` returned the exact Inspector/Judge addresses, `components_configured: true`, and `accounting_balanced: true` with zero covenants.
 
-Production Vercel deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY at `https://driftlock-ruby.vercel.app`. The project currently has Vercel SSO protection, so public browser validation is pending a specific access decision.
+Production Vercel deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY at `https://driftlock-ruby.vercel.app`. The project owner reports manually verifying injected-wallet browser paths, including wallet interaction and transactions. This is manual verification, separate from automated CI.
 
-## Pending live proof
+## Evidence scope
 
-The following items have not yet been verified. Do not infer them from the deployment above.
+The deployment receipts, component binding, schema reads and zero-covenant accounting state above are recorded verification evidence. Owner-reported browser wallet checks are manual and are not automated CI results. This repository does not include a canonical complete demo-covenant lifecycle transaction record, so this document makes no claim that it does.
 
-Required evidence:
-
-- final deployed source commit;
-- Registry / SourceInspector / BreachJudge addresses;
-- deployment and one-time binding transaction hashes;
-- baseline covenant creation + finalized baseline result;
-- unchanged challenge + finalized `NO_RELEVANT_CHANGE`;
-- demo source BEFORE commit SHA;
-- demo source AFTER commit SHA at the same canonical raw URL;
-- second challenge + finalized `MATERIAL_CHANGE`;
-- finalized `BREACH` judgment;
-- finder reward and beneficiary credit reads;
-- withdrawal transactions;
-- final `get_stats` with `accounting_balanced=true`;
-- production frontend manual browser run.
+GenLayer validators independently re-evaluate the covenant against the same frozen canonical URL. The protocol stores bounded verified baseline text and its digest; it does not archive a permanent historical snapshot or diff of every later fetched page.

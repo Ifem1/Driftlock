@@ -59,7 +59,7 @@ Routes:
 - `/protocol` trust-boundary narrative
 - `/demo` reviewer evidence surface
 
-The UI does not fabricate live state when contracts are not configured. Production contract addresses are supplied by `frontend/.env.local` after deployment.
+The UI reads live protocol state from the deployed Registry. Production contract addresses are configured through frontend environment variables and recorded with deployment transactions in [`deployments/studionet.json`](deployments/studionet.json).
 
 ## Contract invariants
 
@@ -105,7 +105,7 @@ npm run dev
 
 ## Deployment
 
-Final release deployment is Studionet `61999` only. Before any write, verify the repository-local CLI release, configured network and RPC. `deploy/deployDriftlock.ts` also refuses a client whose chain ID is not `61999`.
+The current release is deployed to Studionet `61999`. Its Registry, SourceInspector, BreachJudge, deployment transactions and one-time binding transaction are recorded in [`deployments/studionet.json`](deployments/studionet.json). `deploy/deployDriftlock.ts` is retained for reproducibility; it is not part of frontend operation.
 
 The intended bootstrap order is:
 
@@ -117,17 +117,8 @@ The intended bootstrap order is:
 
 Do not treat a transaction hash as proof of finality. Submission evidence must distinguish submitted, accepted and finalized state.
 
-## Live proof plan
+## Evidence and validation
 
-`demo-source/public-promise.txt` is provided as the transparent same-URL demo source. Final deployment should record a two-wallet sequence:
+GitHub Actions run [`36902874013`](https://github.com/Ifem1/Driftlock/actions/runs/36902874013) passed for canonical `main` commit `8a8a805364cfc9ede797732af88fa51627fd6c89`: all three GenVM checks, 30 Direct Mode tests, 9 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
 
-1. create covenant and obtain `BASELINE_VERIFIED`;
-2. challenge unchanged source and obtain `NO_RELEVANT_CHANGE`;
-3. commit a visible change to the same file at the same raw GitHub URL;
-4. challenge again and obtain `MATERIAL_CHANGE` then `BREACH`;
-5. verify finder/beneficiary credits and withdrawals;
-6. confirm accounting remains balanced.
-
-No transaction hashes or live verdicts are pre-filled in this starter. They must be produced and independently checked during the real run.
-
-See `CODEX_HANDOFF.md` for the exact remaining handoff work.
+Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). GenLayer validators independently re-evaluate a covenant against the same frozen canonical URL. The protocol does not claim to archive a permanent historical snapshot or diff of each later fetched page. This repository does not present a complete canonical demo-covenant lifecycle transaction set.

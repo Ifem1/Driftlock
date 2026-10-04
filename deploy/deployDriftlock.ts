@@ -1,7 +1,16 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { DecodedDeployData, GenLayerClient, TransactionHash } from "genlayer-js/types";
-import { TransactionStatus } from "genlayer-js/types";
+import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
+
+function assertSuccessfulFinalization(receipt: any, label: string) {
+  if (receipt?.statusName !== TransactionStatus.FINALIZED || receipt?.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
+    const status = receipt?.statusName ?? receipt?.status ?? "unknown";
+    const execution = receipt?.txExecutionResultName ?? receipt?.txExecutionResult ?? "unknown";
+    const reason = receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
+    throw new Error(`${label} did not finalize with successful execution (status: ${status}, execution: ${execution})${reason ? `: ${reason}` : "."}`);
+  }
+}
 
 async function deploy(client: GenLayerClient<any>, file: string, args: unknown[] = []) {
   const code = new Uint8Array(readFileSync(path.resolve(process.cwd(), file)));
@@ -12,9 +21,7 @@ async function deploy(client: GenLayerClient<any>, file: string, args: unknown[]
     retries: 240,
     interval: 5000,
   } as any);
-  const statusName = receipt?.statusName ?? receipt?.status_name;
-  const ok = statusName === "FINALIZED" || receipt?.status === 6 || receipt?.status === 7 || receipt?.result === 6;
-  if (!ok) throw new Error(`Deployment did not finalize for ${file}: ${JSON.stringify(receipt)}`);
+  assertSuccessfulFinalization(receipt, `Deployment for ${file}`);
   const address = (receipt?.txDataDecoded as DecodedDeployData | undefined)?.contractAddress
     || receipt?.data?.contract_address || receipt?.contract_address || receipt?.recipient;
   if (!address) throw new Error(`No contract address returned for ${file}`);
@@ -43,9 +50,7 @@ export default async function main(client: GenLayerClient<any>) {
     retries: 240,
     interval: 5000,
   } as any);
-  const statusName = configureReceipt?.statusName ?? configureReceipt?.status_name;
-  const configureOk = statusName === "FINALIZED" || configureReceipt?.status === 6 || configureReceipt?.status === 7 || configureReceipt?.result === 6;
-  if (!configureOk) throw new Error(`Component binding did not finalize: ${JSON.stringify(configureReceipt)}`);
+  assertSuccessfulFinalization(configureReceipt, "Component binding");
 
   const manifest = {
     product: "Driftlock",

@@ -63,6 +63,10 @@ export async function ensureStudionet(): Promise<void> {
       }],
     });
   }
+  const confirmed = await provider.request({ method: "eth_chainId" });
+  if (typeof confirmed !== "string" || parseInt(confirmed, 16) !== CHAIN_ID) {
+    throw new Error("Wallet is not connected to GenLayer Studionet");
+  }
 }
 
 type WalletState = {

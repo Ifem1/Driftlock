@@ -21,7 +21,7 @@ export default function CovenantsPage() {
 
   return <section className="page-shell covenants-page">
     <div className="page-intro"><span className="mono-label">COVENANT INDEX / PUBLIC STATE</span><h1>Promises<br/><em>under stake.</em></h1><p>Every live row reads from DriftRegistry on GenLayer Studionet. The source URL and covenant terms are frozen before activation.</p></div>
-    {!configured && <div className="deployment-note"><strong>Protocol address not configured.</strong><span>The interface is built; live covenant rows appear after Codex deploys the contracts and writes the production Registry address.</span></div>}
+    {!configured && <div className="deployment-note"><strong>Protocol address not configured.</strong><span>Live covenant rows appear when the production Registry address is configured.</span></div>}
     {error && <div className="error-banner">{error}</div>}
     <div className="index-controls"><label className="index-search"><Search size={15}/><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search covenants"/></label><div className="filter-tabs">{["ALL","ACTIVE","BREACHED","EXPIRED_UNBREACHED"].map((x) => <button key={x} className={filter === x ? "active" : ""} onClick={() => setFilter(x)}>{x.replaceAll("_", " ")}</button>)}</div></div>
     <div className="covenant-index">

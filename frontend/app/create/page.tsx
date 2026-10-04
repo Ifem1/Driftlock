@@ -58,7 +58,6 @@ export default function CreatePage() {
     setBusy(true); setTx(""); setSubmitStage("wallet");
     try {
       const address = wallet.address || await wallet.connect();
-      if (!wallet.correctNetwork) await wallet.switchNetwork();
       const hash = await submitWrite(address, "create_covenant", [
         form.title.trim(), form.subject.trim(), form.canonicalUrl.trim(), form.promise.trim(), form.breachRule.trim(),
         form.permitted.trim(), form.beneficiary, BigInt(Math.round(Number(form.rewardPercent) * 100)), BigInt(expiry),
@@ -69,7 +68,7 @@ export default function CreatePage() {
       setSubmitStage("consensus");
       await waitForFinalization(hash);
       setSubmitStage("finalized");
-      toast.success("Creation transaction finalized");
+      toast.success("Creation transaction finalized. Baseline verification is processing.");
       const id = await findLatestCovenantByOwner(address, true);
       if (id) router.push(`/covenants/${id}`);
     } catch (e) {

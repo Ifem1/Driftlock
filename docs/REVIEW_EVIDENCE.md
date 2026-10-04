@@ -16,11 +16,11 @@ This file intentionally contains no invented live evidence.
 
 ## Verified release evidence
 
-- Commit `fbd1f3708f6c231e982a9076f6992173ec81ca3b` passed GitHub Actions run `36881540734` (contracts, frontend and CLI jobs).
+- Canonical `main` commit `8a8a805364cfc9ede797732af88fa51627fd6c89` passed [GitHub Actions run `36902874013`](https://github.com/Ifem1/Driftlock/actions/runs/36902874013), including all three GenVM checks, 30 Direct Mode tests, 9 frontend tests, typecheck, lint, build and CLI version check.
 - All three Studionet deployment receipts and the one-time binding receipt returned `FINALIZED`; exact hashes and addresses are in `deployments/studionet.json` and `docs/LIVE_VALIDATION.md`.
 - On-chain schemas matched the expected Registry, Inspector and Judge methods. Registry stats confirmed binding and balanced zero-state accounting.
-- Vercel production deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY. Public access and manual browser paths remain unverified because Vercel SSO protection is enabled.
+- Production Vercel deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY. The project owner reports manually verifying injected-wallet browser interaction and transactions; these checks are separate from CI.
 
-## Live covenant evidence
+## Evidence limits
 
-**Pending.** No covenant, challenge, credit or withdrawal result is claimed here.
+This release repository does not include a canonical complete demo-covenant lifecycle transaction set. Deployment and browser verification do not imply such a recorded lifecycle. GenLayer validators independently re-evaluate covenants against the same frozen canonical URL; the contracts do not archive a permanent snapshot or diff of every later fetched page.

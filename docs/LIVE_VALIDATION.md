@@ -14,7 +14,7 @@ Deployed 2026-10-01 with repository-local GenLayer CLI `0.39.1` and GenVM pin `v
 
 One-time component binding finalized in `0xd3498a192d0548cbc4e695657a22a4f338b1deb72051b0af9104d81dbf153d3c`. All four receipts independently returned `status_name: FINALIZED`. The three deployed schemas were read back. Registry `get_stats` returned the exact Inspector/Judge addresses, `components_configured: true`, and `accounting_balanced: true` with zero covenants.
 
-Production Vercel deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY at `https://driftlock-ruby.vercel.app`. The project owner reports manually verifying injected-wallet browser paths, including wallet interaction and transactions. This is manual verification, separate from automated CI.
+The production frontend is READY at `https://driftlock-nine.vercel.app/`; Vercel reported success for submission-readiness commit `93a4434f52fb62be04c1c4c606cfdd83198d020c`. The project owner reports manually verifying injected-wallet browser paths, including wallet interaction and transactions. This is manual verification, separate from automated CI.
 
 ## Evidence scope
 

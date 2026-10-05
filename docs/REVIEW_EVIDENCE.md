@@ -16,10 +16,10 @@ This file intentionally contains no invented live evidence.
 
 ## Verified release evidence
 
-- Canonical `main` commit `8a8a805364cfc9ede797732af88fa51627fd6c89` passed [GitHub Actions run `36902874013`](https://github.com/Ifem1/Driftlock/actions/runs/36902874013), including all three GenVM checks, 30 Direct Mode tests, 9 frontend tests, typecheck, lint, build and CLI version check.
+- Submission-readiness commit `93a4434f52fb62be04c1c4c606cfdd83198d020c` passed [GitHub Actions run `37244901884`](https://github.com/Ifem1/Driftlock/actions/runs/37244901884), including all three GenVM checks, 30 Direct Mode tests, 14 frontend tests, typecheck, lint, build and CLI version check.
 - All three Studionet deployment receipts and the one-time binding receipt returned `FINALIZED`; exact hashes and addresses are in `deployments/studionet.json` and `docs/LIVE_VALIDATION.md`.
 - On-chain schemas matched the expected Registry, Inspector and Judge methods. Registry stats confirmed binding and balanced zero-state accounting.
-- Production Vercel deployment `dpl_AqVWENg9KbJNHM5DkM7skMhXwWvu` reached READY. The project owner reports manually verifying injected-wallet browser interaction and transactions; these checks are separate from CI.
+- The production frontend is READY at `https://driftlock-nine.vercel.app/`; Vercel reported success for the submission-readiness commit. The project owner reports manually verifying injected-wallet browser interaction and transactions; these checks are separate from CI.
 
 ## Evidence limits
 

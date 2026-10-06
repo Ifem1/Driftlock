@@ -119,6 +119,6 @@ Do not treat a transaction hash as proof of finality. Submission evidence must d
 
 ## Evidence and validation
 
-The challenge-recovery update passed GitHub Actions run [`37520947317`](https://github.com/Ifem1/Driftlock/actions/runs/37520947317): all three GenVM checks, 31 Direct Mode tests, 17 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
+The challenge-recovery update passed GitHub Actions run [`37524911308`](https://github.com/Ifem1/Driftlock/actions/runs/37524911308): all three GenVM checks, 31 Direct Mode tests, 19 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
 
 Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). GenLayer validators independently re-evaluate a covenant against the same frozen canonical URL. The protocol does not claim to archive a permanent historical snapshot or diff of each later fetched page. This repository does not present a complete canonical demo-covenant lifecycle transaction set.

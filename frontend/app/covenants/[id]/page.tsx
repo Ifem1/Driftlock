@@ -4,10 +4,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ExternalLink, LockKeyhole, ScanLine, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
-import { getCovenant, listChallenges, protocolConfigured, submitWrite, waitForFinalization } from "@/lib/protocol";
+import { baselineExpiryAvailable, challengeExpiryAvailable, getCovenant, listChallenges, protocolConfigured, submitWrite, waitForFinalization } from "@/lib/protocol";
 import type { Challenge, Covenant } from "@/lib/types";
 import { attoToGen, isoLabel, shorten, timeLabel } from "@/lib/format";
-import { EXPLORER_URL, useInjectedWallet } from "@/lib/wallet";
+import { EXPLORER_URL, sameWallet, useInjectedWallet } from "@/lib/wallet";
 import { StatusPill } from "@/components/StatusPill";
 
 const stages = ["BASELINE LOCKED", "ACTIVE", "CHALLENGE", "SOURCE INSPECTION", "BREACH JUDGMENT", "SETTLEMENT"];
@@ -32,7 +32,10 @@ export default function CovenantDetailPage() {
 
   async function refresh(latest = false) {
     if (!configured) return;
-    const [c, hs] = await Promise.all([getCovenant(id, latest), listChallenges(id, 0, 24, latest)]);
+    const c = await getCovenant(id, latest);
+    const total = Number(c.challenge_count || 0);
+    const pageSize = Math.min(total, 24);
+    const hs = await listChallenges(id, Math.max(0, total - pageSize), Math.max(1, pageSize), latest);
     setCovenant(c); setChallenges(hs.items.slice().reverse());
   }
   useEffect(() => { void refresh(); }, [id, configured]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -42,22 +45,29 @@ export default function CovenantDetailPage() {
     return () => window.clearInterval(timer);
   }, [configured, covenant?.status, covenant?.pending_challenge, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function challenge() {
-    if (!covenant || !wallet.address) return;
+  async function writeAction(functionName: string, args: string[], submitted: string, success: string, value = 0n) {
+    if (!wallet.address) { toast.error("Connect a wallet to submit this action."); return; }
     setBusy(true); setTx("");
     try {
-      const hash = await submitWrite(wallet.address, "challenge_covenant", [covenant.id], BigInt(covenant.challenge_bond_atto));
-      setTx(hash); toast("Challenge submitted", { description: "Waiting for GenLayer finality." });
+      const hash = await submitWrite(wallet.address, functionName, args, value);
+      setTx(hash); toast(`${submitted} submitted`, { description: "Waiting for GenLayer finality." });
       await waitForFinalization(hash);
-      toast.success("Challenge transaction finalized. Source inspection is processing.");
+      toast.success(success);
       await refresh(true);
     } catch (e) { toast.error(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   }
 
+  function challenge() {
+    if (!covenant) return;
+    void writeAction("challenge_covenant", [covenant.id], "Challenge", "Challenge transaction finalized. Source inspection is processing.", BigInt(covenant.challenge_bond_atto));
+  }
+
   if (!configured) return <section className="page-shell"><div className="deployment-note"><strong>Registry not configured.</strong><span>Deploy Driftlock first, then set NEXT_PUBLIC_REGISTRY_ADDRESS.</span></div></section>;
   if (!covenant) return <section className="page-shell"><div className="loading-panel">Reading finalized covenant state…</div></section>;
   const stage = activeStage(covenant);
+  const canExpireBaseline = baselineExpiryAvailable(covenant);
+  const expirableChallenges = challenges.filter((challenge) => challengeExpiryAvailable(challenge));
 
   return <section className="page-shell detail-page">
     <div className="detail-hero"><div><div className="detail-topline"><StatusPill status={covenant.status}/><span>{covenant.id}</span></div><h1>{covenant.title}</h1><blockquote>{covenant.protected_promise}</blockquote></div><aside className="stake-panel"><small>STAKE LOCKED</small><strong>{attoToGen(covenant.remaining_stake_atto)} <i>GEN</i></strong><dl><div><dt>Owner</dt><dd>{shorten(covenant.owner)}</dd></div><div><dt>Beneficiary</dt><dd>{shorten(covenant.beneficiary)}</dd></div><div><dt>Finder reward</dt><dd>{Number(covenant.finder_reward_bps)/100}%</dd></div><div><dt>Expiry</dt><dd>{timeLabel(covenant.expires_at)}</dd></div></dl></aside></div>
@@ -73,7 +83,14 @@ export default function CovenantDetailPage() {
         <section className="challenge-history"><div className="section-mini-head"><span className="mono-label">CHALLENGE HISTORY / {challenges.length}</span><h2>Every inspection leaves a trace.</h2></div>{!challenges.length && <div className="empty-editorial">No finalized or pending challenges yet.</div>}{challenges.map((h) => <article key={h.id} className="history-row"><div><StatusPill status={h.status}/><strong>{h.id}</strong></div><p>{String(h.judgment?.basis || h.inspection?.basis || "Consensus in progress.")}</p><span>{isoLabel(h.created_at)}</span></article>)}</section>
       </div>
 
-      <aside className="challenge-aside"><div className="challenge-card"><ShieldAlert size={22}/><span className="mono-label">CHALLENGE THE CURRENT PROMISE</span><h3>Inspect the same canonical source again.</h3><p>You do not submit evidence. Driftlock refetches the URL frozen at covenant creation and lets GenLayer decide what changed.</p><div className="bond-line"><span>Challenge bond</span><strong>{attoToGen(covenant.challenge_bond_atto)} GEN</strong></div>{!wallet.connected ? <button className="action-button" onClick={() => void wallet.connect()}>Connect wallet</button> : <button className="action-button" disabled={!covenant.can_challenge || busy} onClick={() => void challenge()}>{busy ? "Resolving…" : covenant.can_challenge ? "Inspect current promise" : "Challenge unavailable"}</button>}{tx && <a className="tx-proof" href={`${EXPLORER_URL}/tx/${tx}`} target="_blank" rel="noreferrer">View submitted transaction ↗</a>}</div></aside>
+      <aside className="challenge-aside"><div className="challenge-card"><ShieldAlert size={22}/><span className="mono-label">CHALLENGE THE CURRENT PROMISE</span><h3>Inspect the same canonical source again.</h3><p>You do not submit evidence. Driftlock refetches the URL frozen at covenant creation and lets GenLayer decide what changed.</p><div className="bond-line"><span>Challenge bond</span><strong>{attoToGen(covenant.challenge_bond_atto)} GEN</strong></div>{!wallet.connected ? <button className="action-button" onClick={() => void wallet.connect()}>Connect wallet</button> : <button className="action-button" disabled={!covenant.can_challenge || busy} onClick={challenge}>{busy ? "Resolving…" : covenant.can_challenge ? "Inspect current promise" : "Challenge unavailable"}</button>}
+        {wallet.connected && (canExpireBaseline || covenant.can_expire || (covenant.status === "BASELINE_RETRYABLE" && !covenant.can_expire && sameWallet(wallet.address, covenant.owner)) || expirableChallenges.length > 0) && <div className="recovery-actions"><span className="mono-label">LIFECYCLE ACTIONS</span>
+          {canExpireBaseline && <button className="action-button" disabled={busy} onClick={() => void writeAction("expire_baseline", [covenant.id], "Baseline expiry", "Baseline timeout finalized and covenant state was updated.")}>Expire baseline attempt</button>}
+          {covenant.status === "BASELINE_RETRYABLE" && !covenant.can_expire && sameWallet(wallet.address, covenant.owner) && <button className="action-button" disabled={busy} onClick={() => void writeAction("retry_baseline", [covenant.id], "Baseline retry", "Baseline retry transaction finalized. Source verification is processing.")}>Retry baseline verification</button>}
+          {covenant.can_expire && <button className="action-button" disabled={busy} onClick={() => void writeAction("expire_covenant", [covenant.id], "Covenant expiry", "Covenant expired and remaining stake was credited to the owner.")}>Expire covenant</button>}
+          {expirableChallenges.map((item) => <button key={item.id} className="action-button" disabled={busy} onClick={() => void writeAction("expire_challenge", [item.id], "Challenge expiry", "Timed-out challenge expired and its bond was credited back to the challenger.")}>Expire timed-out challenge {item.id}</button>)}
+        </div>}
+        {tx && <a className="tx-proof" href={`${EXPLORER_URL}/tx/${tx}`} target="_blank" rel="noreferrer">View submitted transaction ↗</a>}</div></aside>
     </div>
   </section>;
 }

@@ -37,7 +37,7 @@ export default function ProtocolPage() {
     <div className="principle-grid">
       <article><span>FAIL CLOSED</span><h3>Unknown stays unknown.</h3><p>Source failure, ambiguity and inconclusive judgment refund the challenger rather than manufacturing a breach.</p></article>
       <article><span>IMMUTABLE TERMS</span><h3>The owner cannot move the goalposts.</h3><p>Source, promise, rule, beneficiary and reward parameters freeze once the baseline activates.</p></article>
-      <article><span>BOUNDED HISTORY</span><h3>No endless semantic context.</h3><p>Each covenant has a hard lifetime challenge cap. Reads are paginated and prompts never consume cumulative challenge history.</p></article>
+      <article><span>PAGINATED HISTORY</span><h3>Attempts stay independently reviewable.</h3><p>Challenge history is read in bounded pages. A failed, uncertain or non-breach attempt does not consume the opportunity to submit a later valid breach challenge.</p></article>
       <article><span>PULL ACCOUNTING</span><h3>Settlement survives transfer failure.</h3><p>Credits exist before withdrawals, while deposited value remains equal to escrow plus claimable plus withdrawn.</p></article>
     </div>
   </section>;

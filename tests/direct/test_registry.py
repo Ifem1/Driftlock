@@ -86,8 +86,10 @@ def test_late_baseline_from_previous_attempt_cannot_activate_retry(direct_vm, di
     cid = c.create_covenant("Data covenant", "Customer-data policy for Example Company.", "https://example.com/privacy", "Data is never sold.", "Sale of customer data constitutes breach.", "Formatting permitted.", addr(direct_bob), 1000, NOW + 20000)
     direct_vm.value = 0
     warp(direct_vm, NOW + 1800)
+    assert c.get_covenant(cid)["can_expire_baseline"] is True
     c.expire_baseline(cid)
     c.retry_baseline(cid)
+    assert c.get_covenant(cid)["can_expire_baseline"] is False
     direct_vm.sender = direct_charlie
     c.record_baseline(cid, f"{cid}:baseline:1", baseline_ok(f"{cid}:baseline:1"))
     assert c.get_covenant(cid)["status"] == "BASELINE_PENDING"
@@ -150,6 +152,59 @@ def test_source_unavailable_refunds_challenger(direct_vm, direct_deploy, direct_
     assert c.get_covenant(cid)["status"] == "ACTIVE"
 
 
+def test_non_breach_attempts_from_secondary_wallet_do_not_block_later_breach(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
+    warp(direct_vm); direct_vm.sender, direct_vm.value = direct_alice, STAKE
+    c = direct_deploy("contracts/drift_registry.py", addr(direct_charlie), addr(direct_charlie))
+    cid = c.create_covenant(
+        "Data covenant", "Customer-data policy for Example Company.", "https://example.com/privacy",
+        "Customer information is not sold to third parties.",
+        "Sale or commercial licensing of customer information constitutes breach.",
+        "Formatting and unrelated clarification are permitted.", addr(direct_charlie), 1000, NOW + 150000,
+    )
+    direct_vm.value = 0; direct_vm.sender = direct_charlie
+    c.record_baseline(cid, f"{cid}:baseline:1", baseline_ok(f"{cid}:baseline:1"))
+
+    # Bob represents an owner-controlled secondary wallet: only the exact owner address is barred.
+    outcomes = ["SOURCE_UNAVAILABLE", "AMBIGUOUS", "NO_RELEVANT_CHANGE", "INCONCLUSIVE", "PERMITTED_CHANGE", "STALE", "TIMED_OUT"]
+    for attempt in range(25):
+        at = NOW + attempt * 4000
+        warp(direct_vm, at)
+        direct_vm.sender, direct_vm.value = direct_bob, BOND
+        challenge_id = c.challenge_covenant(cid)
+        direct_vm.sender, direct_vm.value = direct_charlie, 0
+        outcome = outcomes[attempt % len(outcomes)]
+        if outcome in ("STALE", "TIMED_OUT"):
+            warp(direct_vm, at + 1801)
+            if outcome == "STALE":
+                c.record_inspection(challenge_id, inspection("SOURCE_UNAVAILABLE"))
+                assert c.get_challenge(challenge_id)["status"] == "STALE"
+            else:
+                c.expire_challenge(challenge_id)
+                assert c.get_challenge(challenge_id)["status"] == "TIMED_OUT"
+        elif outcome in ("INCONCLUSIVE", "PERMITTED_CHANGE"):
+            c.record_inspection(challenge_id, inspection("MATERIAL_CHANGE"))
+            c.record_judgment(challenge_id, judgment(outcome))
+            assert c.get_challenge(challenge_id)["status"] == outcome
+        else:
+            c.record_inspection(challenge_id, inspection(outcome))
+            assert c.get_challenge(challenge_id)["status"] == outcome
+
+    warp(direct_vm, NOW + 25 * 4000)
+    state = c.get_covenant(cid)
+    assert state["challenge_count"] == 25
+    assert state["can_challenge"] is True
+    assert c.get_stats()["accounting_balanced"] is True
+
+    direct_vm.sender, direct_vm.value = direct_bob, BOND
+    breach_id = c.challenge_covenant(cid)
+    direct_vm.sender, direct_vm.value = direct_charlie, 0
+    c.record_inspection(breach_id, inspection("MATERIAL_CHANGE"))
+    c.record_judgment(breach_id, judgment("BREACH"))
+    assert c.get_covenant(cid)["status"] == "BREACHED"
+    assert c.get_challenge(breach_id)["status"] == "BREACH"
+    assert c.get_stats()["accounting_balanced"] is True
+
+
 def test_material_change_then_breach_settles_once(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
     warp(direct_vm); c, cid = create_and_activate(direct_vm, direct_deploy, direct_alice, direct_charlie, direct_charlie)
     direct_vm.sender, direct_vm.value = direct_bob, BOND; chid = c.challenge_covenant(cid)
@@ -185,7 +240,10 @@ def test_inconclusive_judgment_refunds_challenger(direct_vm, direct_deploy, dire
 def test_challenge_timeout_refunds_bond(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
     warp(direct_vm); c, cid = create_and_activate(direct_vm, direct_deploy, direct_alice, direct_charlie, direct_bob)
     direct_vm.sender, direct_vm.value = direct_bob, BOND; chid = c.challenge_covenant(cid); direct_vm.value = 0
-    warp(direct_vm, NOW + 1900); c.expire_challenge(chid)
+    warp(direct_vm, NOW + 1900)
+    assert c.get_challenge(chid)["can_expire"] is True
+    assert c.list_challenges(cid, 0, 24)["items"][0]["can_expire"] is True
+    c.expire_challenge(chid)
     assert c.get_challenge(chid)["status"] == "TIMED_OUT"
     assert c.get_credit(addr(direct_bob)) == str(BOND)
 
@@ -216,7 +274,8 @@ def test_judgment_after_expiry_cannot_breach_or_double_release(direct_vm, direct
     warp(direct_vm); c, cid = create_and_activate(direct_vm, direct_deploy, direct_alice, direct_charlie, direct_bob)
     direct_vm.sender, direct_vm.value = direct_bob, BOND; chid = c.challenge_covenant(cid)
     direct_vm.value = 0; direct_vm.sender = direct_charlie; c.record_inspection(chid, inspection())
-    warp(direct_vm, NOW + 21000); direct_vm.sender = direct_alice; c.expire_covenant(cid)
+    warp(direct_vm, NOW + 21000); assert c.get_covenant(cid)["can_expire"] is True
+    direct_vm.sender = direct_alice; c.expire_covenant(cid)
     direct_vm.sender = direct_charlie; c.record_judgment(chid, judgment("BREACH"))
     assert c.get_covenant(cid)["status"] == "EXPIRED_UNBREACHED"
     assert c.get_challenge(chid)["status"] == "PROTOCOL_BLOCKED"

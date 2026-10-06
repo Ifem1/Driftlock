@@ -14,7 +14,6 @@ MIN_REWARD_BPS = 100
 MAX_REWARD_BPS = 2500
 MAX_COVENANTS_PAGE = 24
 MAX_CHALLENGES_PAGE = 24
-MAX_CHALLENGES_PER_COVENANT = 24
 MAX_TITLE = 100
 MAX_SUBJECT = 1200
 MAX_URL = 800
@@ -340,8 +339,6 @@ class DriftRegistry(gl.Contract):
         challenger = str(gl.message.sender_address)
         if challenger.lower() == covenant["owner"].lower():
             raise gl.vm.UserError("[EXPECTED] covenant owner cannot challenge their own covenant")
-        if int(covenant.get("challenge_count", 0)) >= MAX_CHALLENGES_PER_COVENANT:
-            raise gl.vm.UserError("[EXPECTED] covenant lifetime challenge limit reached")
         if now < int(covenant.get("last_challenge_at", "0")) + CHALLENGE_COOLDOWN:
             raise gl.vm.UserError("[EXPECTED] covenant challenge cooldown is active")
         if now + INSPECTION_TIMEOUT + JUDGE_TIMEOUT + 300 >= int(covenant["expires_at"]):
@@ -538,9 +535,13 @@ class DriftRegistry(gl.Contract):
             covenant["status"] == "ACTIVE" and not covenant.get("pending_challenge")
             and now >= int(covenant.get("last_challenge_at", "0")) + CHALLENGE_COOLDOWN
             and now + INSPECTION_TIMEOUT + JUDGE_TIMEOUT + 300 < int(covenant["expires_at"])
-            and int(covenant.get("challenge_count", 0)) < MAX_CHALLENGES_PER_COVENANT
         )
         covenant["can_expire"] = now >= int(covenant["expires_at"]) and covenant["status"] not in TERMINAL_COVENANT
+        covenant["can_expire_baseline"] = (
+            covenant["status"] == "BASELINE_PENDING"
+            and now >= int(covenant["baseline_deadline"])
+            and now < int(covenant["expires_at"])
+        )
         return covenant
 
     @gl.public.view
@@ -580,7 +581,12 @@ class DriftRegistry(gl.Contract):
         items = []
         for index in range(start, stop):
             challenge_id = self.covenant_challenge_index[f"{covenant_id}:{index}"]
-            items.append(self._challenge(challenge_id))
+            challenge = self._challenge(challenge_id)
+            challenge["can_expire"] = (
+                challenge["status"] in ("INSPECTION_PENDING", "JUDGMENT_PENDING")
+                and _now() >= int(challenge["stage_deadline"])
+            )
+            items.append(challenge)
         return {"items": items, "total": str(total)}
 
     @gl.public.view
@@ -615,7 +621,7 @@ class DriftRegistry(gl.Contract):
             "product": "Driftlock", "version": VERSION, "network": "StudioNet", "chain_id": NETWORK_ID,
             "rpc": "https://studio.genlayer.com/api", "inspector": self.inspector_address,
             "judge": self.judge_address, "components_configured": self.components_configured,
-            "admin_controls": False, "protocol_fee_bps": "0", "max_challenges_per_covenant": str(MAX_CHALLENGES_PER_COVENANT),
+            "admin_controls": False, "protocol_fee_bps": "0", "max_challenges_per_covenant": "unlimited",
             "total_covenants": str(len(self.covenant_ids)), "total_challenges": str(int(self.total_challenges)),
             "covenants_activated": str(int(self.covenants_activated)), "covenants_breached": str(int(self.covenants_breached)),
             "covenants_expired": str(int(self.covenants_expired)), "total_deposited_atto": str(int(self.total_deposited)),

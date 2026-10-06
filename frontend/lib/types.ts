@@ -30,6 +30,7 @@ export type Covenant = {
   created_at: string;
   activated_at: string;
   expires_at: string;
+  baseline_deadline?: string;
   baseline_review?: BaselineReview | null;
   pending_challenge?: string;
   challenge_count: number | string;
@@ -40,6 +41,7 @@ export type Covenant = {
   closed_at?: string;
   can_challenge?: boolean;
   can_expire?: boolean;
+  can_expire_baseline?: boolean;
 };
 
 export type Challenge = {

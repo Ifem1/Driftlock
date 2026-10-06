@@ -2,13 +2,14 @@
 
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
-import { ExecutionResult, TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
+import { ExecutionResult, executionResultNumberToName, TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
 import { ensureStudionet, injectedProvider, RPC_URL } from "./wallet";
 import type { Challenge, Covenant, ProtocolStats } from "./types";
+import deployment from "../../deployments/studionet.json";
 
-export const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_REGISTRY_ADDRESS || "";
-export const INSPECTOR_ADDRESS = process.env.NEXT_PUBLIC_INSPECTOR_ADDRESS || "";
-export const JUDGE_ADDRESS = process.env.NEXT_PUBLIC_JUDGE_ADDRESS || "";
+export const REGISTRY_ADDRESS = deployment.contracts.registry.address;
+export const INSPECTOR_ADDRESS = deployment.contracts.inspector.address;
+export const JUDGE_ADDRESS = deployment.contracts.judge.address;
 
 export function protocolConfigured(): boolean {
   return /^0x[0-9a-fA-F]{40}$/.test(REGISTRY_ADDRESS);
@@ -133,9 +134,23 @@ export function assertSuccessfulExecution(receipt: any, hash = "transaction"): v
   if (receipt?.statusName !== TransactionStatus.FINALIZED) {
     throw new Error(`${hash} did not finalize (status: ${receipt?.statusName ?? receipt?.status ?? "unknown"}).`);
   }
-  if (receipt?.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
-    const execution = receipt?.txExecutionResultName ?? receipt?.txExecutionResult ?? "unknown";
-    const reason = receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
+  const leaders = receipt?.consensus_data?.leader_receipt?.filter((item: any) => item.mode === "leader") ?? [];
+  const leader = leaders.at(-1);
+  const resultName = receipt?.txExecutionResultName
+    ?? (receipt?.txExecutionResult !== undefined
+      ? executionResultNumberToName[String(receipt.txExecutionResult) as keyof typeof executionResultNumberToName]
+      : undefined)
+    ?? (leader?.execution_result === "SUCCESS" && leader?.genvm_result?.raw_error == null
+      ? ExecutionResult.FINISHED_WITH_RETURN
+      : leader?.execution_result === "ERROR" || leader?.genvm_result?.raw_error != null
+        ? ExecutionResult.FINISHED_WITH_ERROR
+        : undefined);
+  if (resultName !== ExecutionResult.FINISHED_WITH_RETURN) {
+    const execution = resultName ?? "unknown";
+    const reasonValue = leader?.genvm_result?.error_description
+      ?? leader?.genvm_result?.raw_error
+      ?? receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
+    const reason = typeof reasonValue === "string" ? reasonValue : JSON.stringify(reasonValue);
     throw new Error(`${hash} finalized but contract execution failed (${execution})${reason ? `: ${reason}` : "."}`);
   }
 }

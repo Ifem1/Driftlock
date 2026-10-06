@@ -59,7 +59,7 @@ Routes:
 - `/protocol` trust-boundary narrative
 - `/demo` reviewer evidence surface
 
-The UI reads live protocol state from the deployed Registry. Production contract addresses are configured through frontend environment variables and recorded with deployment transactions in [`deployments/studionet.json`](deployments/studionet.json).
+The UI reads live protocol state from the deployed Registry. Contract addresses come from [`deployments/studionet.json`](deployments/studionet.json), which records deployment and binding transactions.
 
 ## Contract invariants
 
@@ -68,7 +68,7 @@ The UI reads live protocol state from the deployed Registry. Production contract
 - covenant owner cannot challenge their own covenant;
 - challengers cannot supply alternate evidence URLs;
 - only one challenge may be pending per covenant;
-- a covenant has a hard lifetime challenge cap;
+- challenge outcomes do not consume a lifetime quota; cooldown and covenant expiry bound when another attempt can be made;
 - source failure / ambiguity / inconclusive judgment cannot create a breach;
 - late callbacks cannot re-settle closed state;
 - protocol settlement uses pull credits;
@@ -119,6 +119,6 @@ Do not treat a transaction hash as proof of finality. Submission evidence must d
 
 ## Evidence and validation
 
-Submission-readiness commit `93a4434f52fb62be04c1c4c606cfdd83198d020c` passed GitHub Actions run [`37244901884`](https://github.com/Ifem1/Driftlock/actions/runs/37244901884): all three GenVM checks, 30 Direct Mode tests, 14 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
+The challenge-recovery update passed GitHub Actions run [`37520947317`](https://github.com/Ifem1/Driftlock/actions/runs/37520947317): all three GenVM checks, 31 Direct Mode tests, 17 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
 
 Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). GenLayer validators independently re-evaluate a covenant against the same frozen canonical URL. The protocol does not claim to archive a permanent historical snapshot or diff of each later fetched page. This repository does not present a complete canonical demo-covenant lifecycle transaction set.

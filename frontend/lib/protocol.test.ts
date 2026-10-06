@@ -42,6 +42,34 @@ describe("finalized transaction execution", () => {
       txExecutionResultName: "FINISHED_WITH_RETURN",
     }, "0xabc")).toThrow("0xabc did not finalize (status: ACCEPTED)");
   });
+
+  it("accepts the live GenLayer receipt shape when the leader executed successfully", () => {
+    expect(() => assertSuccessfulExecution({
+      statusName: "FINALIZED",
+      resultName: "MAJORITY_AGREE",
+      consensus_data: {
+        leader_receipt: [{
+          mode: "leader",
+          execution_result: "SUCCESS",
+          genvm_result: { raw_error: null },
+        }],
+      },
+    }, "0xabc")).not.toThrow();
+  });
+
+  it("rejects a finalized live receipt when the leader reports execution error", () => {
+    expect(() => assertSuccessfulExecution({
+      statusName: "FINALIZED",
+      resultName: "MAJORITY_AGREE",
+      consensus_data: {
+        leader_receipt: [{
+          mode: "leader",
+          execution_result: "ERROR",
+          genvm_result: { raw_error: { error: "expiry must be in range" } },
+        }],
+      },
+    }, "0xabc")).toThrow("0xabc finalized but contract execution failed (FINISHED_WITH_ERROR)");
+  });
 });
 
 describe("recovery action eligibility", () => {

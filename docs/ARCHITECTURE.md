@@ -4,9 +4,11 @@
 
 `DriftRegistry` is deterministic lifecycle and accounting state. It does not fetch websites and does not author semantic verdicts.
 
-`SourceInspector` has two source-grounded tasks: establish that the promised statement exists at creation, and later inspect the current contents of that exact URL. It compares stable semantic fields under independent validator replay rather than free-form reasoning prose.
+`SourceInspector` has two source-grounded tasks. At creation it verifies that the source supports the protected promise, the breach rule is testable and in scope, and the operative source is compliant with the covenant with no breach condition already present. Later it re-fetches the same canonical URL and evaluates the current semantic state relative to that verified compliant baseline. A `NO_RELEVANT_CHANGE` result requires current compliance; `MATERIAL_CHANGE` requires accessible same-subject evidence of current non-compliance or a supported operative breach condition. Validators replay stable bounded fields, not free-form reasoning prose.
 
-`BreachJudge` runs only after a verified `MATERIAL_CHANGE`. It independently re-fetches the canonical source and asks a different question: whether the current operative wording violates the frozen breach rule after applying explicitly permitted changes.
+`BreachJudge` runs only after a normalized `MATERIAL_CHANGE` tied to a verified compliant baseline. It independently re-fetches the canonical source and asks a different question: whether the current operative wording violates the frozen breach rule after applying explicitly permitted changes.
+
+The protocol stores a bounded semantic baseline result, not the source document itself. It does not store fetched source text, a source digest, or an exact historical page snapshot. Validators re-fetch the same frozen canonical URL for later decisions.
 
 ## Bounded state
 

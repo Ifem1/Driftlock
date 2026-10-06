@@ -1,5 +1,7 @@
 export type BaselineReview = {
   status?: "BASELINE_VERIFIED" | "PROMISE_NOT_SUPPORTED" | "SOURCE_UNAVAILABLE" | "AMBIGUOUS" | string;
+  baseline_compliant?: boolean;
+  breach_condition_present?: boolean;
   basis?: string;
   recorded_at?: string;
   [key: string]: unknown;
@@ -7,6 +9,9 @@ export type BaselineReview = {
 
 export type InspectionReview = {
   status?: "NO_RELEVANT_CHANGE" | "MATERIAL_CHANGE" | "SOURCE_UNAVAILABLE" | "AMBIGUOUS" | string;
+  current_compliant?: boolean;
+  breach_condition_now_supported?: boolean;
+  promise_still_supported?: boolean;
   basis?: string;
   recorded_at?: string;
   [key: string]: unknown;

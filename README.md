@@ -2,7 +2,7 @@
 
 **Stake a public promise. Prove when it changes.**
 
-Driftlock is a GenLayer-native covenant protocol for changing public information. An owner stakes test GEN behind a precise promise at one canonical HTTPS source. GenLayer first verifies that the promise actually exists. Later, a challenger can ask the protocol to re-fetch that same frozen URL. `SourceInspector` determines whether a material relevant change occurred; only then does a separate `BreachJudge` decide whether the current wording violates the immutable covenant. `DriftRegistry` settles stake and challenge bonds from the finalized result.
+Driftlock is a GenLayer-native covenant protocol for changing public information. An owner stakes test GEN behind a precise promise at one canonical HTTPS source. GenLayer first verifies that the source supports the promise and is compliant with the frozen breach rule, with no active breach condition already present. Later, a challenger can ask the protocol to re-fetch that same frozen URL. `SourceInspector` compares the current semantic state with the verified compliant baseline; only a current covenant-relevant non-compliance proceeds to a separate `BreachJudge`, which independently re-fetches the URL before deciding whether the current wording violates the immutable covenant. `DriftRegistry` settles stake and challenge bonds from the finalized result.
 
 This repository is intentionally locked to **GenLayer Studionet**:
 
@@ -17,8 +17,8 @@ This repository is intentionally locked to **GenLayer Studionet**:
 
 A deterministic contract cannot independently fetch a live public policy and semantically decide whether its current wording materially changed or breached a natural-language rule. Driftlock deliberately splits those two nondeterministic questions:
 
-1. **SourceInspector** — did the immutable canonical source materially change in a relevant way?
-2. **BreachJudge** — does that verified change violate the frozen covenant?
+1. **SourceInspector** — was the initial source compliant, and is its present semantic state materially non-compliant relative to that verified baseline?
+2. **BreachJudge** — does an independent re-fetch show that the current state violates the frozen covenant?
 
 The Registry never substitutes a server verdict for either consensus result.
 
@@ -64,6 +64,9 @@ The UI reads live protocol state from the deployed Registry. Contract addresses 
 ## Contract invariants
 
 - a covenant cannot become `ACTIVE` without a finalized verified baseline;
+- a verified baseline is compliant with the covenant and contains no active breach condition;
+- the bounded semantic baseline result is passed into current inspection; source text and source digests are not stored;
+- `NO_RELEVANT_CHANGE` requires a currently compliant source; `MATERIAL_CHANGE` requires accessible same-subject current non-compliance;
 - canonical URL, promise, breach rule, permitted changes, beneficiary and finder reward cannot be edited after creation;
 - covenant owner cannot challenge their own covenant;
 - challengers cannot supply alternate evidence URLs;
@@ -121,4 +124,4 @@ Do not treat a transaction hash as proof of finality. Submission evidence must d
 
 The challenge-recovery update passed GitHub Actions run [`37524911308`](https://github.com/Ifem1/Driftlock/actions/runs/37524911308): all three GenVM checks, 31 Direct Mode tests, 19 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
 
-Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). GenLayer validators independently re-evaluate a covenant against the same frozen canonical URL. The protocol does not claim to archive a permanent historical snapshot or diff of each later fetched page. This repository does not present a complete canonical demo-covenant lifecycle transaction set.
+Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). Driftlock stores a bounded semantic baseline result, not the fetched source document, a source digest, or an exact historical page snapshot. Current inspection is evaluated relative to that verified baseline, and BreachJudge independently re-fetches the same frozen canonical URL before settlement. This repository does not present a complete canonical demo-covenant lifecycle transaction set.

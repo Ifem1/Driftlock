@@ -210,6 +210,59 @@ class DriftRegistry(gl.Contract):
             raise gl.vm.UserError("[EXPECTED] semantic callback must be an object")
         return value
 
+    def _validate_baseline_packet(self, result: dict) -> None:
+        fields = (
+            "source_accessible", "same_subject", "protected_promise_supported", "rule_testable",
+            "time_scope_valid", "baseline_compliant", "breach_condition_present",
+        )
+        if any(type(result.get(field)) is not bool for field in fields):
+            raise gl.vm.UserError("[EXPECTED] baseline callback fields must be booleans")
+        status = result.get("status")
+        if status == "BASELINE_VERIFIED":
+            if (not all(result[field] for field in fields if field != "breach_condition_present")
+                    or result["breach_condition_present"]):
+                raise gl.vm.UserError("[EXPECTED] verified baseline must be compliant and breach-free")
+        elif status == "SOURCE_UNAVAILABLE":
+            if any(result[field] for field in fields):
+                raise gl.vm.UserError("[EXPECTED] unavailable baseline cannot carry positive semantic fields")
+        elif status == "PROMISE_NOT_SUPPORTED":
+            if result["protected_promise_supported"] or result["baseline_compliant"]:
+                raise gl.vm.UserError("[EXPECTED] unsupported promise cannot be a compliant baseline")
+        elif status == "AMBIGUOUS":
+            if result["baseline_compliant"]:
+                raise gl.vm.UserError("[EXPECTED] ambiguous baseline cannot be certified compliant")
+        else:
+            raise gl.vm.UserError("[EXPECTED] unknown baseline status")
+
+    def _validate_inspection_packet(self, result: dict) -> None:
+        fields = (
+            "source_accessible", "same_subject", "promise_still_supported", "current_compliant",
+            "breach_condition_now_supported", "effective_now",
+        )
+        if any(type(result.get(field)) is not bool for field in fields):
+            raise gl.vm.UserError("[EXPECTED] inspection callback fields must be booleans")
+        status = result.get("status")
+        if status == "NO_RELEVANT_CHANGE":
+            if (not result["source_accessible"] or not result["same_subject"]
+                    or not result["promise_still_supported"] or not result["current_compliant"]
+                    or result["breach_condition_now_supported"]):
+                raise gl.vm.UserError("[EXPECTED] no-change result requires current compliant source")
+        elif status == "MATERIAL_CHANGE":
+            if (not result["source_accessible"] or not result["same_subject"]
+                    or (result["current_compliant"] and not result["breach_condition_now_supported"])
+                    or not result["effective_now"]):
+                raise gl.vm.UserError("[EXPECTED] material change requires current same-subject non-compliance")
+        elif status == "SOURCE_UNAVAILABLE":
+            if any(result[field] for field in fields):
+                raise gl.vm.UserError("[EXPECTED] unavailable inspection cannot carry positive semantic fields")
+        elif status == "AMBIGUOUS":
+            if any(result[field] for field in (
+                "promise_still_supported", "current_compliant", "breach_condition_now_supported", "effective_now"
+            )):
+                raise gl.vm.UserError("[EXPECTED] ambiguous inspection cannot assert a definitive semantic state")
+        else:
+            raise gl.vm.UserError("[EXPECTED] unknown inspection status")
+
     @gl.public.write.payable
     def create_covenant(self, title: str, subject: str, canonical_url: str, protected_promise: str,
                         breach_rule: str, permitted_changes: str, beneficiary: str,
@@ -309,9 +362,8 @@ class DriftRegistry(gl.Contract):
         result = self._validate_callback_json(result_json)
         if result.get("request_id") != expected_request or result.get("kind") != "BASELINE":
             raise gl.vm.UserError("[EXPECTED] baseline callback request mismatch")
+        self._validate_baseline_packet(result)
         status = result.get("status")
-        if status not in BASELINE_STATUSES:
-            raise gl.vm.UserError("[EXPECTED] unknown baseline status")
         covenant["baseline_review"] = result
         if _now() >= int(covenant["expires_at"]):
             self._release_stake(covenant, covenant["owner"])
@@ -372,7 +424,12 @@ class DriftRegistry(gl.Contract):
         self.bond_escrow = u256(int(self.bond_escrow) + bond)
         gl.get_contract_at(Address(self.inspector_address)).emit(on="finalized").inspect_current(
             challenge_id, str(gl.message.contract_address), covenant["subject"], covenant["canonical_url"],
-            covenant["protected_promise"], covenant["breach_rule"], covenant["permitted_changes"]
+            covenant["protected_promise"], covenant["breach_rule"], covenant["permitted_changes"],
+            _json({"status": covenant["baseline_review"]["status"],
+                   **{key: covenant["baseline_review"][key] for key in (
+                       "source_accessible", "same_subject", "protected_promise_supported", "rule_testable",
+                       "time_scope_valid", "baseline_compliant", "breach_condition_present", "basis",
+                   )}})
         )
         return challenge_id
 
@@ -384,9 +441,17 @@ class DriftRegistry(gl.Contract):
             return
         covenant = self._covenant(challenge["covenant_id"])
         result = self._validate_callback_json(result_json)
+        if result.get("request_id") != challenge_id or result.get("kind") != "CURRENT":
+            raise gl.vm.UserError("[EXPECTED] inspection callback request mismatch")
+        self._validate_inspection_packet(result)
         status = result.get("status")
-        if status not in INSPECTION_STATUSES:
-            raise gl.vm.UserError("[EXPECTED] unknown inspection status")
+        if (not isinstance(result.get("baseline_context"), dict)
+                or result["baseline_context"].get("status") != "BASELINE_VERIFIED"
+                or any(result["baseline_context"].get(key) != covenant["baseline_review"].get(key) for key in (
+                    "source_accessible", "same_subject", "protected_promise_supported", "rule_testable",
+                    "time_scope_valid", "baseline_compliant", "breach_condition_present", "basis",
+                ))):
+            raise gl.vm.UserError("[EXPECTED] inspection does not reference the verified baseline")
         challenge["inspection"] = result
         covenant["last_inspection"] = result
 
@@ -432,8 +497,25 @@ class DriftRegistry(gl.Contract):
         covenant = self._covenant(challenge["covenant_id"])
         result = self._validate_callback_json(result_json)
         outcome = result.get("outcome")
-        if outcome not in JUDGMENT_OUTCOMES:
-            raise gl.vm.UserError("[EXPECTED] unknown breach judgment")
+        fields = ("breach_supported", "permitted_by_rule", "same_subject", "effective_now")
+        if (result.get("request_id") != challenge_id or result.get("kind") != "JUDGMENT"
+                or outcome not in JUDGMENT_OUTCOMES or any(type(result.get(field)) is not bool for field in fields)):
+            raise gl.vm.UserError("[EXPECTED] malformed breach judgment")
+        inspection = challenge.get("inspection")
+        if not isinstance(inspection, dict) or inspection.get("status") != "MATERIAL_CHANGE":
+            raise gl.vm.UserError("[EXPECTED] judgment requires a valid material inspection")
+        if outcome == "BREACH" and (
+            not result["breach_supported"] or result["permitted_by_rule"]
+            or not result["same_subject"] or not result["effective_now"]
+        ):
+            raise gl.vm.UserError("[EXPECTED] inconsistent breach judgment")
+        if outcome == "PERMITTED_CHANGE" and (
+            not result["permitted_by_rule"] or result["breach_supported"]
+            or not result["same_subject"] or not result["effective_now"]
+        ):
+            raise gl.vm.UserError("[EXPECTED] inconsistent permitted-change judgment")
+        if outcome == "INCONCLUSIVE" and result["breach_supported"] and result["permitted_by_rule"]:
+            raise gl.vm.UserError("[EXPECTED] inconclusive judgment asserts contradictory findings")
         challenge["judgment"] = result
 
         if covenant["status"] != "ACTIVE" or _now() >= int(covenant["expires_at"]) or _now() >= int(challenge["stage_deadline"]):

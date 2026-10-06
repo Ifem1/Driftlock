@@ -16,7 +16,7 @@ The current deployment manifest is [`deployments/studionet.json`](../deployments
 
 ## Production app
 
-The production app remains [`https://driftlock-nine.vercel.app`](https://driftlock-nine.vercel.app). The frontend must redeploy from the updated `main` commit before this release is live there; production bundle verification is pending that deployment.
+The production app remains [`https://driftlock-nine.vercel.app`](https://driftlock-nine.vercel.app). After the main update, `/covenants`, `/create`, and `/activity` each returned HTTP 200, and their referenced JavaScript bundles contained the fresh Registry address `0xb5c8117DC80Dc9d84ECc95dFa139a4f06CD8d299`.
 
 ## Browser verification and live lifecycle evidence
 

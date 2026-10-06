@@ -13,6 +13,7 @@
 - The three current Studionet deployment transactions and one-time binding transaction finalized with successful leader execution and majority agreement. Current addresses and hashes are in [`deployments/studionet.json`](../deployments/studionet.json) and [`LIVE_VALIDATION.md`](LIVE_VALIDATION.md).
 - Live schema read-back confirmed the deployed interfaces, including the baseline packet argument to current inspection.
 - Registry read-back confirmed the exact configured component addresses, chain ID `61999`, zero initial covenant/challenge/escrow/credit state, and `accounting_balanced: true`.
+- The existing production routes returned HTTP 200, and their loaded bundles contain the fresh Registry address.
 - A complete lifecycle transaction set for this fresh deployment has not been recorded.
 
 ## Evidence limits

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { attoToGen, genToAtto, shorten, statusTone } from "./format";
-import { assertSuccessfulExecution } from "./protocol";
+import { assertSuccessfulExecution, baselineExpiryAvailable, challengeExpiryAvailable } from "./protocol";
+import type { Challenge, Covenant } from "./types";
 
 describe("format helpers", () => {
   it("round-trips GEN to atto units", () => {
@@ -40,5 +41,34 @@ describe("finalized transaction execution", () => {
       statusName: "ACCEPTED",
       txExecutionResultName: "FINISHED_WITH_RETURN",
     }, "0xabc")).toThrow("0xabc did not finalize (status: ACCEPTED)");
+  });
+});
+
+describe("recovery action eligibility", () => {
+  it("supports the deployed covenant view without a can_expire_baseline field", () => {
+    expect(baselineExpiryAvailable({
+      status: "BASELINE_PENDING", baseline_deadline: "100", expires_at: "200",
+    } as unknown as Covenant, 100)).toBe(true);
+    expect(baselineExpiryAvailable({
+      status: "BASELINE_PENDING", baseline_deadline: "100", expires_at: "200",
+    } as unknown as Covenant, 200)).toBe(false);
+  });
+
+  it("supports the deployed challenge list without a can_expire field", () => {
+    expect(challengeExpiryAvailable({
+      status: "INSPECTION_PENDING", stage_deadline: "100",
+    } as unknown as Challenge, 100)).toBe(true);
+    expect(challengeExpiryAvailable({
+      status: "BREACH", stage_deadline: "100",
+    } as unknown as Challenge, 200)).toBe(false);
+  });
+
+  it("uses explicit finalized Registry eligibility when available", () => {
+    expect(baselineExpiryAvailable({
+      status: "BASELINE_PENDING", can_expire_baseline: false, baseline_deadline: "1", expires_at: "200",
+    } as unknown as Covenant, 100)).toBe(false);
+    expect(challengeExpiryAvailable({
+      status: "JUDGMENT_PENDING", can_expire: false, stage_deadline: "1",
+    } as unknown as Challenge, 100)).toBe(false);
   });
 });

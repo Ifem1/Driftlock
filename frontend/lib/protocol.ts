@@ -101,6 +101,20 @@ export async function getStats(): Promise<ProtocolStats> { return read("get_stat
 export async function getCredit(address: string, latest = false): Promise<string> { return read("get_credit", [address], latest); }
 export async function findLatestCovenantByOwner(address: string, latest = false): Promise<string> { return read("find_latest_covenant_by_owner", [address], latest); }
 
+export function baselineExpiryAvailable(covenant: Covenant, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
+  if (typeof covenant.can_expire_baseline === "boolean") return covenant.can_expire_baseline;
+  const deadline = Number(covenant.baseline_deadline);
+  return covenant.status === "BASELINE_PENDING" && Number.isFinite(deadline)
+    && deadline > 0 && nowSeconds >= deadline && nowSeconds < Number(covenant.expires_at);
+}
+
+export function challengeExpiryAvailable(challenge: Challenge, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
+  if (typeof challenge.can_expire === "boolean") return challenge.can_expire;
+  const deadline = Number(challenge.stage_deadline);
+  return (challenge.status === "INSPECTION_PENDING" || challenge.status === "JUDGMENT_PENDING")
+    && Number.isFinite(deadline) && deadline > 0 && nowSeconds >= deadline;
+}
+
 export async function submitWrite(address: string, functionName: string, args: unknown[] = [], value = 0n): Promise<string> {
   await ensureStudionet();
   const client = await writeClient(address);

@@ -131,8 +131,11 @@ export async function waitForFinalization(hash: string): Promise<unknown> {
 }
 
 export function assertSuccessfulExecution(receipt: any, hash = "transaction"): void {
-  if (receipt?.statusName !== TransactionStatus.FINALIZED) {
-    throw new Error(`${hash} did not finalize (status: ${receipt?.statusName ?? receipt?.status ?? "unknown"}).`);
+  // genlayer-js returns `status_name` from its simplified receipt, while its
+  // full transaction form uses `statusName`.
+  const statusName = receipt?.statusName ?? receipt?.status_name;
+  if (statusName !== TransactionStatus.FINALIZED) {
+    throw new Error(`${hash} did not finalize (status: ${statusName ?? receipt?.status ?? "unknown"}).`);
   }
   const leaders = receipt?.consensus_data?.leader_receipt?.filter((item: any) => item.mode === "leader") ?? [];
   const leader = leaders.at(-1);

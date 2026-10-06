@@ -28,6 +28,17 @@ describe("finalized transaction execution", () => {
     }, "0xabc")).not.toThrow();
   });
 
+  it("accepts the simplified genlayer-js receipt field name", () => {
+    expect(() => assertSuccessfulExecution({
+      status_name: "FINALIZED",
+      consensus_data: { leader_receipt: [{
+        mode: "leader",
+        execution_result: "SUCCESS",
+        genvm_result: { raw_error: null },
+      }] },
+    }, "0xabc")).not.toThrow();
+  });
+
   it("rejects finalized contract execution errors with the execution reason", () => {
     expect(() => assertSuccessfulExecution({
       statusName: "FINALIZED",

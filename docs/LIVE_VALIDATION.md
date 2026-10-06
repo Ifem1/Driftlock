@@ -12,7 +12,11 @@ The updated contracts were deployed to GenLayer Studionet on 2026-10-06 from sou
 
 One-time component binding finalized in `0x6cd587b1e3397add31afac309cf0d3f0a8603d2e1658956e64ba38ddca413ea8`. All four receipts report `FINALIZED` with successful leader execution. The new Registry read-back returns the configured Inspector and Judge addresses, chain ID `61999`, `accounting_balanced: true`, and zero initial covenants and balances. The previous Registry also had zero covenants and zero escrow when the app was switched to the new deployment.
 
-The deployment manifest is [`deployments/studionet.json`](../deployments/studionet.json). The production frontend update follows the merged repository configuration.
+The deployment manifest is [`deployments/studionet.json`](../deployments/studionet.json).
+
+## Production app
+
+Vercel reported a successful production deployment after merge commit `3efdbeaa30d117b2b18e0950c457db5926b34dad`. The app is live at [`https://driftlock-nine.vercel.app`](https://driftlock-nine.vercel.app). The site returned HTTP 200, and the `/covenants`, `/create`, and `/activity` bundles contain the current Registry address.
 
 ## Browser verification and evidence scope
 

@@ -1,14 +1,28 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { DecodedDeployData, GenLayerClient, TransactionHash } from "genlayer-js/types";
-import { ExecutionResult, TransactionStatus } from "genlayer-js/types";
+import { ExecutionResult, executionResultNumberToName, TransactionStatus } from "genlayer-js/types";
 
 function assertSuccessfulFinalization(receipt: any, label: string) {
-  if (receipt?.statusName !== TransactionStatus.FINALIZED || receipt?.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
+  const leader = receipt?.consensus_data?.leader_receipt
+    ?.filter((item: any) => item.mode === "leader")
+    .at(-1);
+  const execution = receipt?.txExecutionResultName
+    ?? (receipt?.txExecutionResult !== undefined
+      ? executionResultNumberToName[String(receipt.txExecutionResult)]
+      : undefined)
+    ?? (leader?.execution_result === "SUCCESS" && leader?.genvm_result?.raw_error == null
+      ? ExecutionResult.FINISHED_WITH_RETURN
+      : leader?.execution_result === "ERROR" || leader?.genvm_result?.raw_error != null
+        ? ExecutionResult.FINISHED_WITH_ERROR
+        : undefined);
+  if (receipt?.statusName !== TransactionStatus.FINALIZED || execution !== ExecutionResult.FINISHED_WITH_RETURN) {
     const status = receipt?.statusName ?? receipt?.status ?? "unknown";
-    const execution = receipt?.txExecutionResultName ?? receipt?.txExecutionResult ?? "unknown";
-    const reason = receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
-    throw new Error(`${label} did not finalize with successful execution (status: ${status}, execution: ${execution})${reason ? `: ${reason}` : "."}`);
+    const reasonValue = leader?.genvm_result?.error_description
+      ?? leader?.genvm_result?.raw_error
+      ?? receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
+    const reason = typeof reasonValue === "string" ? reasonValue : JSON.stringify(reasonValue);
+    throw new Error(`${label} did not finalize with successful execution (status: ${status}, execution: ${execution ?? "unknown"})${reason ? `: ${reason}` : "."}`);
   }
 }
 
@@ -67,11 +81,8 @@ export default async function main(client: GenLayerClient<any>) {
     "NEXT_PUBLIC_GENLAYER_CHAIN_ID=61999",
     "NEXT_PUBLIC_GENLAYER_RPC_URL=https://studio.genlayer.com/api",
     "NEXT_PUBLIC_GENLAYER_EXPLORER=https://explorer-studio.genlayer.com",
-    `NEXT_PUBLIC_REGISTRY_ADDRESS=${registry.address}`,
-    `NEXT_PUBLIC_INSPECTOR_ADDRESS=${inspector.address}`,
-    `NEXT_PUBLIC_JUDGE_ADDRESS=${judge.address}`,
     "",
   ].join("\n"));
-  console.log("Wrote deployments/studionet.json and frontend/.env.local");
+  console.log("Wrote deployments/studionet.json and network settings in frontend/.env.local");
   return manifest;
 }

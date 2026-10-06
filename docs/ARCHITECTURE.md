@@ -10,7 +10,7 @@
 
 ## Bounded state
 
-Each covenant stores only its latest baseline/inspection summary plus deterministic metadata. Challenge history is indexed and paginated. A covenant accepts at most 24 lifetime challenges, so semantic work cannot accumulate an unbounded evidence graph. Wallet challenge indexes are direct and paginated rather than implemented as unbounded global scans.
+Each covenant stores only its latest baseline/inspection summary plus deterministic metadata. Challenge history is indexed and paginated in pages of at most 24 records. Attempts do not consume a lifetime challenge quota; the 15-minute cooldown and 30-day maximum covenant lifetime bound attempts in time. Wallet challenge indexes are direct and paginated rather than implemented as unbounded global scans.
 
 ## Economic states
 

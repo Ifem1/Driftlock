@@ -2,24 +2,28 @@
 
 ## Studionet deployment
 
-The updated contracts were deployed to GenLayer Studionet on 2026-10-06 from source commit `e7642875db65b8e94410c18d12c819493122a022` using GenLayer CLI `0.39.1`.
+The semantic transition hardening was deployed to GenLayer Studionet `61999` from source commit `eb7a1860e215b86dee4cc3fe241fbb9ebb2c80a6` using the repository-local GenLayer CLI `0.39.1` and GenVM `v0.2.12`.
 
 | Component | Address | Finalized deployment transaction |
 | --- | --- | --- |
-| DriftRegistry | `0x2f51Bbf5c41BA4E734f460A4DeE22B6227C8820D` | `0xc8732bb26bb0e250ece2d489c63719124b66c52016c8b11c7def001de9e42e90` |
-| SourceInspector | `0xfBeB8719Fe4F351480bc250B495201D09cE753eD` | `0x55a7f85d6069bde832727389693eaf1e672612bbf06961dd60313e66d4723464` |
-| BreachJudge | `0x311b57C0888f388a0241F4D42EFc8Da65Ca33136` | `0x491e9bfb4d30929e89c9065d03372161605152fa1e04e8933c9dbe1cedaedd3c` |
+| DriftRegistry | `0xb5c8117DC80Dc9d84ECc95dFa139a4f06CD8d299` | [`0xe5f08d7a560b42782bcc6dae0b1c69ea7e7359d49593e18d49ba9c7bf90353fe`](https://explorer-studio.genlayer.com/tx/0xe5f08d7a560b42782bcc6dae0b1c69ea7e7359d49593e18d49ba9c7bf90353fe) |
+| SourceInspector | `0x3DEB5a5B75d7ef6fc0DEd87bC4FB8Bc1E4E57326` | [`0xc5bd08ac5692bfadbe3f2e7c5c5ec6c227f3a0a5e3710cfabf6c1626f695d4e8`](https://explorer-studio.genlayer.com/tx/0xc5bd08ac5692bfadbe3f2e7c5c5ec6c227f3a0a5e3710cfabf6c1626f695d4e8) |
+| BreachJudge | `0x4e2ab474ebcD75C768ba07b66062D3D187280A97` | [`0x46187b3dab8869ee3d9e255d06ca6cd490f04e42ac44751ee61146c7cc0c80c0`](https://explorer-studio.genlayer.com/tx/0x46187b3dab8869ee3d9e255d06ca6cd490f04e42ac44751ee61146c7cc0c80c0) |
 
-One-time component binding finalized in `0x6cd587b1e3397add31afac309cf0d3f0a8603d2e1658956e64ba38ddca413ea8`. All four receipts report `FINALIZED` with successful leader execution. The new Registry read-back returns the configured Inspector and Judge addresses, chain ID `61999`, `accounting_balanced: true`, and zero initial covenants and balances. The previous Registry also had zero covenants and zero escrow when the app was switched to the new deployment.
+The one-time component binding finalized in [`0x0010a466482c61a74fef61dd8cb9f8d8ee08239ae5bb67ac4e69783e60771388`](https://explorer-studio.genlayer.com/tx/0x0010a466482c61a74fef61dd8cb9f8d8ee08239ae5bb67ac4e69783e60771388). All four receipts reported `FINALIZED`, `MAJORITY_AGREE`, and successful leader execution. Live read-back of all three schemas confirmed the deployed methods, including `inspect_current(..., baseline_packet_json)`. Registry `get_stats` returned the configured Inspector and Judge addresses, `components_configured: true`, `chain_id: 61999`, zero covenants/challenges, zero stake/bond escrow, zero claimable/withdrawn value, and `accounting_balanced: true`.
 
-The deployment manifest is [`deployments/studionet.json`](../deployments/studionet.json).
+The current deployment manifest is [`deployments/studionet.json`](../deployments/studionet.json). The frontend imports its Registry address from this manifest.
 
 ## Production app
 
-Vercel reported a successful production deployment after merge commit `3efdbeaa30d117b2b18e0950c457db5926b34dad`. The app is live at [`https://driftlock-nine.vercel.app`](https://driftlock-nine.vercel.app). The site returned HTTP 200, and the `/covenants`, `/create`, and `/activity` bundles contain the current Registry address.
+The production app remains [`https://driftlock-nine.vercel.app`](https://driftlock-nine.vercel.app). The frontend must redeploy from the updated `main` commit before this release is live there; production bundle verification is pending that deployment.
 
-## Browser verification and evidence scope
+## Browser verification and live lifecycle evidence
 
-The project owner reports manually verifying injected-wallet browser paths, including wallet interaction and transactions. These manual checks are separate from automated CI. This repository does not include a canonical complete demo-covenant lifecycle transaction record, so this document makes no claim that it does.
+The project owner previously reported manually verifying injected-wallet browser paths and transactions. Those manual checks are distinct from automated CI.
 
-GenLayer validators independently re-evaluate a covenant against the same frozen canonical URL. The current contracts store only the semantic baseline result and its basis, not fetched source text or a source digest. They do not archive an exact historical page snapshot or diff.
+This repository does not include a new canonical full lifecycle transaction set for the fresh deployment. No complete Wallet A creation → clean baseline → Wallet B unchanged challenge → same-source breach update → independent BREACH settlement sequence is claimed here.
+
+## Source evidence limits
+
+Driftlock stores only a bounded semantic baseline result and its basis. It does not store fetched source text, a source digest, or an exact historical page snapshot. Current inspection evaluates the present source relative to the verified compliant semantic baseline. GenLayer validators re-fetch the same frozen canonical URL, and BreachJudge independently re-fetches it before economic settlement. This is not a historical byte-for-byte page comparison.

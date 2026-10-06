@@ -16,7 +16,7 @@ export function protocolConfigured(): boolean {
 }
 
 function assertRegistry(): `0x${string}` {
-  if (!protocolConfigured()) throw new Error("Driftlock Registry is not configured. Set NEXT_PUBLIC_REGISTRY_ADDRESS.");
+  if (!protocolConfigured()) throw new Error("Driftlock Registry is not configured in deployments/studionet.json.");
   return REGISTRY_ADDRESS as `0x${string}`;
 }
 

@@ -122,6 +122,6 @@ Do not treat a transaction hash as proof of finality. Submission evidence must d
 
 ## Evidence and validation
 
-The challenge-recovery update passed GitHub Actions run [`37524911308`](https://github.com/Ifem1/Driftlock/actions/runs/37524911308): all three GenVM checks, 31 Direct Mode tests, 19 frontend tests, typecheck, lint, production build and CLI version check. The project owner reports manually verifying injected-wallet browser paths, including wallet transactions, account and chain changes, rejection behavior and responsive wallet behavior. Manual checks are separate from CI.
+The semantic hardening passes all three GenVM checks, 52 Direct Mode tests, 19 frontend tests, TypeScript typecheck, ESLint, Next.js production build, and the repository-local GenLayer CLI version check. GitHub Actions provides the CI record for each pushed commit. The project owner has manually verified injected-wallet browser paths; these manual checks are separate from CI.
 
 Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). Driftlock stores a bounded semantic baseline result, not the fetched source document, a source digest, or an exact historical page snapshot. Current inspection is evaluated relative to that verified baseline, and BreachJudge independently re-fetches the same frozen canonical URL before settlement. This repository does not present a complete canonical demo-covenant lifecycle transaction set.

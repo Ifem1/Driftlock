@@ -1,27 +1,20 @@
 # Review evidence
 
-This file intentionally contains no invented live evidence.
+## Repository verification
 
-## Repository evidence
+- All three Intelligent Contracts pass GenVM lint and validation with GenVM `v0.2.12`.
+- Direct Mode regression suite: 52 tests, including baseline compliance, transition consistency, independent judgment, stale callbacks, accounting, recovery actions, and the owner-controlled secondary-wallet case.
+- Frontend verification: 19 tests, typecheck, ESLint, and Next.js production build pass.
+- The repository-local GenLayer CLI reports `0.39.1`.
+- Frontend contract addresses are read from the Studionet deployment manifest; writes enforce chain ID `61999`, wait for `FINALIZED`, and reject unsuccessful contract execution.
 
-- semantic responsibilities are split across three contracts;
-- source URLs are HTTPS-only and bounded;
-- source render text is bounded;
-- component callers are authenticated;
-- challenge history reads are paginated, and cooldown plus covenant expiry bound attempts in time;
-- challenge spam is cooldown-gated;
-- deterministic accounting exposes a conservation invariant;
-- frontend has no application backend and uses injected EIP-1193 only;
-- CI checks contracts and frontend.
+## Verified Studionet release
 
-## Verified release evidence
-
-- The deployment update passed [GitHub Actions run `37524911308`](https://github.com/Ifem1/Driftlock/actions/runs/37524911308), including all three GenVM checks, 31 Direct Mode tests, 19 frontend tests, typecheck, lint, build and CLI version check.
-- All three current Studionet deployment receipts and the one-time binding receipt finalized with successful leader execution; addresses and hashes are in `deployments/studionet.json` and `docs/LIVE_VALIDATION.md`.
-- Registry read-back confirmed the configured component addresses, chain ID 61999, and balanced zero-state accounting.
-- Vercel reported success for the production app update; the live app bundles the current Registry address.
-- The project owner reports manually verifying injected-wallet browser interaction and transactions; these checks are separate from CI.
+- The three current Studionet deployment transactions and one-time binding transaction finalized with successful leader execution and majority agreement. Current addresses and hashes are in [`deployments/studionet.json`](../deployments/studionet.json) and [`LIVE_VALIDATION.md`](LIVE_VALIDATION.md).
+- Live schema read-back confirmed the deployed interfaces, including the baseline packet argument to current inspection.
+- Registry read-back confirmed the exact configured component addresses, chain ID `61999`, zero initial covenant/challenge/escrow/credit state, and `accounting_balanced: true`.
+- A complete lifecycle transaction set for this fresh deployment has not been recorded.
 
 ## Evidence limits
 
-This repository does not include a canonical complete demo-covenant lifecycle transaction set. Deployment and browser verification do not imply such a recorded lifecycle. GenLayer validators independently re-evaluate covenants against the same frozen canonical URL; the contracts store the semantic baseline result and its basis, not fetched source text or a source digest.
+The contracts store only a bounded semantic baseline result and basis. They do not store fetched source text, a source digest, or an exact historical page snapshot. Current validators re-fetch the same frozen canonical URL, and BreachJudge independently re-fetches before settlement.

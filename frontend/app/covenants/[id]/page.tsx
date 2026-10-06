@@ -63,7 +63,7 @@ export default function CovenantDetailPage() {
     void writeAction("challenge_covenant", [covenant.id], "Challenge", "Challenge transaction finalized. Source inspection is processing.", BigInt(covenant.challenge_bond_atto));
   }
 
-  if (!configured) return <section className="page-shell"><div className="deployment-note"><strong>Registry not configured.</strong><span>Deploy Driftlock first, then set NEXT_PUBLIC_REGISTRY_ADDRESS.</span></div></section>;
+  if (!configured) return <section className="page-shell"><div className="deployment-note"><strong>Registry not configured.</strong><span>Set the Registry address in deployments/studionet.json.</span></div></section>;
   if (!covenant) return <section className="page-shell"><div className="loading-panel">Reading finalized covenant state…</div></section>;
   const stage = activeStage(covenant);
   const canExpireBaseline = baselineExpiryAvailable(covenant);

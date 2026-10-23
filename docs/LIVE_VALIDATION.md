@@ -1,4 +1,6 @@
-# Live validation
+# Historical V1 live validation
+
+> This page preserves the prior V1 deployment receipts and product state. V2 has since been deployed and is active in the current manifest and production app. Use [`milestone-v2/LIVE_VERIFICATION.md`](milestone-v2/LIVE_VERIFICATION.md) for current V2 addresses, production deployment, lifecycle evidence and limitations.
 
 ## Studionet deployment
 

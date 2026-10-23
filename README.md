@@ -106,7 +106,13 @@ npm run build
 npm run dev
 ```
 
+After installing the pinned Python, root Node and frontend dependencies, run the complete local release gate from the repository root with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1`. It compiles Python, checks Studionet/source consistency, scans for secrets, runs all three pinned GenVM linter/ABI checks, runs Direct Mode and frontend tests, typechecks, lints, performs the cached offline npm audits and builds the production frontend. The 2026-10-23 release run passed; separate fresh online audits for root and frontend also reported zero vulnerabilities.
+
 ## Deployment
+
+### V2 milestone status
+
+The `milestone/driftlock-v2-assurance-appeals` branch contains V2 multi-source policy commitments, bounded rendered-text evidence and a bonded appeal lifecycle. Corrected V2 contracts are deployed and bound on Studionet; the active manifest and production app point to them. Local release gates pass. Live evidence includes a verified baseline, unchanged-source challenge and upheld bonded appeal, plus a controlled source change, independent breach judgment, stake payout and credit withdrawals through the V2 Registry's retained V1-compatible single-source method. V2 multi-source attempts that conflicted with corroboration correctly remained ambiguous; a V2 multi-source breach appeal is not claimed. Injected-wallet browser paths and hosted CI are not claimed. Start with [`MILESTONE_V2.md`](MILESTONE_V2.md) and [`docs/milestone-v2/LIVE_VERIFICATION.md`](docs/milestone-v2/LIVE_VERIFICATION.md). Historical V1 receipts are preserved in [`deployments/studionet-v1.json`](deployments/studionet-v1.json).
 
 The current release is deployed to Studionet `61999`. Its Registry, SourceInspector, BreachJudge, deployment transactions and one-time binding transaction are recorded in [`deployments/studionet.json`](deployments/studionet.json). `deploy/deployDriftlock.ts` is retained for reproducibility; it is not part of frontend operation.
 
@@ -122,6 +128,6 @@ Do not treat a transaction hash as proof of finality. Submission evidence must d
 
 ## Evidence and validation
 
-The semantic hardening passes all three GenVM checks, 52 Direct Mode tests, 19 frontend tests, TypeScript typecheck, ESLint, Next.js production build, and the repository-local GenLayer CLI version check. GitHub Actions provides the CI record for each pushed commit. The project owner has manually verified injected-wallet browser paths; these manual checks are separate from CI.
+The V2 local gate passes all three GenVM linter/ABI checks, 69 Direct Mode contract tests, 21 frontend tests, Python compile/preflight and secret scanning, TypeScript typecheck, ESLint, cached offline dependency audits, and the Next.js production build with the active V2 manifest. Fresh online audits also report zero vulnerabilities. The production Vercel deployment is ready and its six routes and contract addresses were checked over HTTP. Hosted GitHub Actions and injected-wallet browser verification are not claimed.
 
-Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). Driftlock stores a bounded semantic baseline result, not the fetched source document, a source digest, or an exact historical page snapshot. Current inspection is evaluated relative to that verified baseline, and BreachJudge independently re-fetches the same frozen canonical URL before settlement. This repository does not present a complete canonical demo-covenant lifecycle transaction set.
+Deployment receipts, read-back evidence and evidence limits are documented in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md). Driftlock stores a bounded semantic baseline result, not the fetched source document, a source digest, or an exact historical page snapshot. Current inspection is evaluated relative to that verified baseline, and BreachJudge independently re-fetches the same frozen canonical URL before settlement. A controlled live source-change and breach payout transaction set is documented in [`docs/milestone-v2/LIVE_VERIFICATION.md`](docs/milestone-v2/LIVE_VERIFICATION.md); the V2 multi-source breach appeal path remains unverified.

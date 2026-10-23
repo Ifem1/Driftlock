@@ -1,0 +1,7 @@
+# Evidence provenance
+
+Each V2 source entry freezes role, URL and declared publisher. The Inspector records retrieval status and, for a complete nonempty rendered artifact of at most 6,000 UTF-8 bytes, the full rendered text, byte length and SHA-256. It rejects oversized or empty artifacts instead of hashing a prefix. The policy JSON is serialized with sorted keys, compact separators and UTF-8 before hashing. The registry recomputes every artifact digest and binds each callback to the policy digest.
+
+Baseline and incident evidence are separately recorded. The Judge reviews the incident text saved by the Inspector; appeal review uses that same saved incident. A later web edit cannot mutate the stored text. The commitment covers **GenLayer rendered text**, not raw HTTP response bytes, TLS transcript or a publisher signature. `recorded_at` is a chain execution timestamp, not independent proof of when the remote page was published. Declared publisher names and distinct site suffixes do not authenticate editorial independence.
+
+An unavailable or oversized primary cannot produce a definitive result. If the incident artifact is missing, appeal submission is rejected and timeout recovery is available. Evidence bytes stored on-chain may be costly. Source-matched V2 contracts and representative multi-source baseline/appeal lifecycle are live; the live breach payout used the Registry's retained single-source compatibility method. V2 multi-source breach-appeal behavior and representative storage-cost measurements remain outstanding.

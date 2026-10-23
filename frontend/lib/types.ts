@@ -18,6 +18,9 @@ export type InspectionReview = {
 };
 
 export type Covenant = {
+  protocol_version?: number;
+  evidence_policy?: { version: number; min_corroborations: number; sources: { url: string; role: string; publisher: string }[] };
+  evidence_policy_digest?: string;
   id: string;
   title: string;
   subject: string;
@@ -61,6 +64,12 @@ export type Challenge = {
   judgment?: Record<string, unknown> | null;
   settled_at?: string;
   finder_reward_atto?: string;
+  appeal_deadline?: string;
+  appeal_bond_atto?: string;
+  appellant?: string;
+  appeal_result?: string;
+  appeal_judgment?: Record<string, unknown> | null;
+  can_finalize?: boolean;
   can_expire?: boolean;
 };
 
@@ -82,4 +91,5 @@ export type ProtocolStats = {
   covenants_breached: string;
   covenants_expired: string;
   accounting_balanced: boolean;
+  appeal_escrow_atto?: string;
 };

@@ -59,6 +59,18 @@ def test_baseline_validator_rejects_semantic_disagreement(direct_vm, direct_depl
     assert direct_vm.run_validator() is False
 
 
+def test_baseline_rejects_status_alias_instead_of_silently_accepting_it(direct_vm, direct_deploy, direct_alice):
+    warp(direct_vm)
+    contract = direct_deploy("contracts/source_inspector.py", addr(direct_alice))
+    direct_vm.sender = direct_alice
+    direct_vm.mock_web(r".*example\.com/policy.*", {"status": 200, "body": "Customer data is not sold."})
+    direct_vm.mock_llm(r"(?s).*DRIFTLOCK_BASELINE_V2.*", json.dumps({**baseline(), "status": "VERIFIED"}))
+    with pytest.raises(Exception, match="invalid baseline status"):
+        contract.inspect_baseline("dl-alias:baseline:1", "dl-alias", addr(direct_alice), "Customer-data policy",
+                                  "https://example.com/policy", "Data is not sold.", "Sale is breach.",
+                                  "Formatting is permitted.")
+
+
 def test_current_inspection_detects_material_change(direct_vm, direct_deploy, direct_alice):
     warp(direct_vm); contract = direct_deploy("contracts/source_inspector.py", addr(direct_alice)); direct_vm.sender = direct_alice
     direct_vm.mock_web(r".*example\.com/policy.*", {"status": 200, "body": "Customer data may be licensed to partners."})

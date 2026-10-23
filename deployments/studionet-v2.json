@@ -1,0 +1,30 @@
+{
+  "product": "Driftlock",
+  "protocolVersion": 2,
+  "network": "studionet",
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "explorer": "https://explorer-studio.genlayer.com",
+  "deployedAt": "2026-10-23T16:55:05.085Z",
+  "sourceCommit": "f9793cc67ad11ebcf89b420c624e9e8ad537dced",
+  "genlayerCliVersion": "0.39.1",
+  "genvmVersion": "v0.2.12",
+  "contracts": {
+    "registry": {
+      "address": "0xf8ccE1A56C69129ff32d822af5BAa0b3081CF6F4",
+      "txHash": "0x7ba6afbfc8d53666881131369243644498bc723550ace5ae4b8ecd20923ae80c",
+      "sourceSha256": "23ba7c224c974451db47e999be93cf16eed6ebe73dd1a3ca1f0b2eef9aab47d7"
+    },
+    "inspector": {
+      "address": "0x2d14C4eF96D3B61e22F34abA232628380fa00c51",
+      "txHash": "0x717531b2be54fe5ab7a7b202057cb264291482c927cacc538e25e4221f80a30b",
+      "sourceSha256": "1e507a1483536cf4e996bfb1d6040035ecf1514dad0f73ce14d8fc14f064ddd7"
+    },
+    "judge": {
+      "address": "0x9144eb009DAc03e3C653bC1E5b50793B66A2Ef89",
+      "txHash": "0xe47513b3e5fd43382684690fb59c6c5b2a37837132429aeddb769c9ce00e81d7",
+      "sourceSha256": "e1a63d5d2e49a4cc80c740776178f18522a9a64b6d8a1daaf039d9663bfa9d77"
+    },
+    "configureTxHash": "0x3e6eaf6e792af4415b5f7faa38c65c874b5dd6fcd124849bb64e71860a6efb36"
+  }
+}

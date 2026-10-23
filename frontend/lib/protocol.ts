@@ -10,6 +10,7 @@ import deployment from "../../deployments/studionet.json";
 export const REGISTRY_ADDRESS = deployment.contracts.registry.address;
 export const INSPECTOR_ADDRESS = deployment.contracts.inspector.address;
 export const JUDGE_ADDRESS = deployment.contracts.judge.address;
+export const PROTOCOL_VERSION = Number((deployment as { protocolVersion?: number }).protocolVersion || 1);
 
 export function protocolConfigured(): boolean {
   return /^0x[0-9a-fA-F]{40}$/.test(REGISTRY_ADDRESS);
@@ -98,6 +99,10 @@ export async function listChallenges(id: string, offset = 0, count = 24, latest 
 export async function listWalletChallenges(address: string, offset = 0, count = 24, latest = false): Promise<{ items: Challenge[]; total: string }> {
   return read("list_wallet_challenges", [address, BigInt(offset), BigInt(count)], latest);
 }
+export async function listWalletAppeals(address: string, offset = 0, count = 24, latest = false): Promise<{ items: Challenge[]; total: string }> {
+  if (PROTOCOL_VERSION !== 2) return { items: [], total: "0" };
+  return read("list_wallet_appeals", [address, BigInt(offset), BigInt(count)], latest);
+}
 export async function getStats(): Promise<ProtocolStats> { return read("get_stats"); }
 export async function getCredit(address: string, latest = false): Promise<string> { return read("get_credit", [address], latest); }
 export async function findLatestCovenantByOwner(address: string, latest = false): Promise<string> { return read("find_latest_covenant_by_owner", [address], latest); }
@@ -112,7 +117,7 @@ export function baselineExpiryAvailable(covenant: Covenant, nowSeconds = Math.fl
 export function challengeExpiryAvailable(challenge: Challenge, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
   if (typeof challenge.can_expire === "boolean") return challenge.can_expire;
   const deadline = Number(challenge.stage_deadline);
-  return (challenge.status === "INSPECTION_PENDING" || challenge.status === "JUDGMENT_PENDING")
+  return (challenge.status === "INSPECTION_PENDING" || challenge.status === "JUDGMENT_PENDING" || challenge.status === "APPEAL_PENDING")
     && Number.isFinite(deadline) && deadline > 0 && nowSeconds >= deadline;
 }
 
@@ -136,6 +141,10 @@ export function assertSuccessfulExecution(receipt: any, hash = "transaction"): v
   const statusName = receipt?.statusName ?? receipt?.status_name;
   if (statusName !== TransactionStatus.FINALIZED) {
     throw new Error(`${hash} did not finalize (status: ${statusName ?? receipt?.status ?? "unknown"}).`);
+  }
+  const consensus = receipt?.resultName ?? receipt?.result_name;
+  if (consensus && consensus !== "MAJORITY_AGREE") {
+    throw new Error(`${hash} finalized without validator majority agreement (${consensus}).`);
   }
   const leaders = receipt?.consensus_data?.leader_receipt?.filter((item: any) => item.mode === "leader") ?? [];
   const leader = leaders.at(-1);

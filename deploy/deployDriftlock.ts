@@ -1,4 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import type { DecodedDeployData, GenLayerClient, TransactionHash } from "genlayer-js/types";
 import { ExecutionResult, executionResultNumberToName, TransactionStatus } from "genlayer-js/types";
@@ -16,18 +18,22 @@ function assertSuccessfulFinalization(receipt: any, label: string) {
       : leader?.execution_result === "ERROR" || leader?.genvm_result?.raw_error != null
         ? ExecutionResult.FINISHED_WITH_ERROR
         : undefined);
-  if (receipt?.statusName !== TransactionStatus.FINALIZED || execution !== ExecutionResult.FINISHED_WITH_RETURN) {
-    const status = receipt?.statusName ?? receipt?.status ?? "unknown";
+  const statusName = receipt?.statusName ?? receipt?.status_name;
+  const consensus = receipt?.resultName ?? receipt?.result_name;
+  if (statusName !== TransactionStatus.FINALIZED || execution !== ExecutionResult.FINISHED_WITH_RETURN ||
+      (consensus && consensus !== "MAJORITY_AGREE")) {
+    const status = statusName ?? receipt?.status ?? "unknown";
     const reasonValue = leader?.genvm_result?.error_description
       ?? leader?.genvm_result?.raw_error
       ?? receipt?.consensus_data?.leader_receipt?.find((item: any) => item.error)?.error;
     const reason = typeof reasonValue === "string" ? reasonValue : JSON.stringify(reasonValue);
-    throw new Error(`${label} did not finalize with successful execution (status: ${status}, execution: ${execution ?? "unknown"})${reason ? `: ${reason}` : "."}`);
+    throw new Error(`${label} did not finalize with successful execution (status: ${status}, consensus: ${consensus ?? "unknown"}, execution: ${execution ?? "unknown"})${reason ? `: ${reason}` : "."}`);
   }
 }
 
 async function deploy(client: GenLayerClient<any>, file: string, args: unknown[] = []) {
   const code = new Uint8Array(readFileSync(path.resolve(process.cwd(), file)));
+  const sourceSha256 = createHash("sha256").update(code).digest("hex");
   const hash = await client.deployContract({ code, args } as any);
   const receipt: any = await client.waitForTransactionReceipt({
     hash: hash as TransactionHash,
@@ -39,7 +45,7 @@ async function deploy(client: GenLayerClient<any>, file: string, args: unknown[]
   const address = (receipt?.txDataDecoded as DecodedDeployData | undefined)?.contractAddress
     || receipt?.data?.contract_address || receipt?.contract_address || receipt?.recipient;
   if (!address) throw new Error(`No contract address returned for ${file}`);
-  return { address: String(address), txHash: String(hash), hash: String(hash) };
+  return { address: String(address), txHash: String(hash), sourceSha256 };
 }
 
 export default async function main(client: GenLayerClient<any>) {
@@ -65,17 +71,33 @@ export default async function main(client: GenLayerClient<any>) {
     interval: 5000,
   } as any);
   assertSuccessfulFinalization(configureReceipt, "Component binding");
+  const stats: any = await (client as any).readContract({
+    address: registry.address, functionName: "get_stats", args: [],
+  });
+  const state = stats instanceof Map ? Object.fromEntries(stats) : stats;
+  if (String(state?.version) !== "0.2.0-assurance-appeals" ||
+      String(state?.chain_id) !== "61999" || state?.components_configured !== true ||
+      String(state?.inspector).toLowerCase() !== inspector.address.toLowerCase() ||
+      String(state?.judge).toLowerCase() !== judge.address.toLowerCase() ||
+      state?.accounting_balanced !== true) {
+    throw new Error("V2 Registry read-back failed; refusing to update active deployment manifest");
+  }
 
   const manifest = {
     product: "Driftlock",
+    protocolVersion: 2,
     network: "studionet",
     chainId: 61999,
     rpc: "https://studio.genlayer.com/api",
     explorer: "https://explorer-studio.genlayer.com",
     deployedAt: new Date().toISOString(),
+    sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+    genlayerCliVersion: "0.39.1",
+    genvmVersion: "v0.2.12",
     contracts: { registry, inspector, judge, configureTxHash: String(configureHash) },
   };
   mkdirSync(path.resolve(process.cwd(), "deployments"), { recursive: true });
+  writeFileSync(path.resolve(process.cwd(), "deployments/studionet-v2.json"), JSON.stringify(manifest, null, 2) + "\n");
   writeFileSync(path.resolve(process.cwd(), "deployments/studionet.json"), JSON.stringify(manifest, null, 2) + "\n");
   writeFileSync(path.resolve(process.cwd(), "frontend/.env.local"), [
     "NEXT_PUBLIC_GENLAYER_CHAIN_ID=61999",

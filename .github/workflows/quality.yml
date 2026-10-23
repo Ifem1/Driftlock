@@ -13,6 +13,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
+      - run: python scripts/preflight.py
+      - run: python scripts/scan_secrets.py
       - name: Pin GenVM runtime
         run: echo "GENVM_VERSION=v0.2.12" >> "$GITHUB_ENV"
       - run: genvm-lint check contracts/drift_registry.py --json

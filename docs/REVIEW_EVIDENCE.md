@@ -1,5 +1,7 @@
 # Review evidence
 
+> **Historical V1 review record.** Current V2 implementation, test, deployment, production and lifecycle evidence is maintained in [`milestone-v2/LIVE_VERIFICATION.md`](milestone-v2/LIVE_VERIFICATION.md) and [`milestone-v2/V1_V2_MATRIX.md`](milestone-v2/V1_V2_MATRIX.md). Counts and addresses below refer to the earlier release.
+
 ## Repository verification
 
 - All three Intelligent Contracts pass GenVM lint and validation with GenVM `v0.2.12`.

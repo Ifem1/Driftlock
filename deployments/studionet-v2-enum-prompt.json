@@ -1,0 +1,30 @@
+{
+  "product": "Driftlock",
+  "protocolVersion": 2,
+  "network": "studionet",
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "explorer": "https://explorer-studio.genlayer.com",
+  "deployedAt": "2026-10-23T16:30:09.651Z",
+  "sourceCommit": "1869a4b0675c708967d424a2037c680a88d20edc",
+  "genlayerCliVersion": "0.39.1",
+  "genvmVersion": "v0.2.12",
+  "contracts": {
+    "registry": {
+      "address": "0x811Cd83877fC3e61937193785fcA1B95691B6b0e",
+      "txHash": "0xa7d0e60fe39e54fa72a6e669b88d7f2fbfa31a79b9f81ca224fd2992f0c2d54d",
+      "sourceSha256": "c7d7bbe83f38707adc0381f82c080212037f04cd9d860afa50aadd4289c67a2c"
+    },
+    "inspector": {
+      "address": "0x70cc435EC66603cE67DB8d2a011899E0FF4c6eC9",
+      "txHash": "0x83066a531a3897156533ee1cdd52a1cb838c10df2c43c162799d154d9777449f",
+      "sourceSha256": "3bd726d6355cac918e5f555cb689dde90400fb4933b88bafe144a963e8c50e5b"
+    },
+    "judge": {
+      "address": "0x283E7a37C3c987d2A9e3b3a4B59E9E6d29fBF42B",
+      "txHash": "0x7f4675f46d84ca7e0c0001d59f495b74eacaf774b60f0af6d3a1c0481442f7bd",
+      "sourceSha256": "e1a63d5d2e49a4cc80c740776178f18522a9a64b6d8a1daaf039d9663bfa9d77"
+    },
+    "configureTxHash": "0xf4edbfe57a968de98cec0a3e7f8cf768d8aeca3070e612dd2a6a3c9c847c1098"
+  }
+}

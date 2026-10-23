@@ -1,17 +1,19 @@
 "use client";
 
 import { EXPLORER_URL } from "@/lib/wallet";
+import { PROTOCOL_VERSION } from "@/lib/protocol";
+import deployment from "../../../deployments/studionet.json";
 
 const components = [
-  ["DRIFT REGISTRY", "0xDc1bDE6d262baAa6084a474570b73E724De12ddA", "0xa61bcf245944be3c2bb5be42d847f0f53e9292c3f04390f00c2414c811d23c73"],
-  ["SOURCE INSPECTOR", "0xBb19613948808a9323594C0945118F10C7979585", "0x2050636fe00199dabffbe07419651bd42cb4f9b5104051b2662feca7bb5a6945"],
-  ["BREACH JUDGE", "0xbb3acd8a549A3Ab5c18deC6762f9876B1E13bfaf", "0x20c9798fe26b2a7d9ee79a53e4d3b6e25a0dd0be269a360869141df70f9c23a0"],
+  ["DRIFT REGISTRY", deployment.contracts.registry.address, deployment.contracts.registry.txHash],
+  ["SOURCE INSPECTOR", deployment.contracts.inspector.address, deployment.contracts.inspector.txHash],
+  ["BREACH JUDGE", deployment.contracts.judge.address, deployment.contracts.judge.txHash],
 ];
-const bindingTx = "0xd3498a192d0548cbc4e695657a22a4f338b1deb72051b0af9104d81dbf153d3c";
+const bindingTx = deployment.contracts.configureTxHash;
 
 export default function DemoPage() {
-  return <section className="page-shell demo-page"><div className="page-intro"><span className="mono-label">STUDIONET / DEPLOYMENT EVIDENCE</span><h1>Deployed protocol.<br/><em>Public evidence.</em></h1><p>Driftlock is deployed on GenLayer Studionet. The addresses and finalized transactions below identify the live components and their one-time binding.</p></div>
-    <div className="evidence-status"><span className="proof-dot live"/><div><strong>Studionet deployment verified · Chain 61999</strong><p>GenLayer validators independently re-evaluate each covenant against the same frozen canonical URL. The protocol does not claim a permanent archive or diff of every later fetched webpage.</p></div></div>
+  return <section className="page-shell demo-page"><div className="page-intro"><span className="mono-label">STUDIONET / DEPLOYMENT EVIDENCE</span><h1>Deployed protocol.<br/><em>Public evidence.</em></h1><p>These addresses come from the active deployment manifest. They identify the {PROTOCOL_VERSION === 2 ? "V2" : "historical V1"} Studionet components and their recorded binding.</p></div>
+    <div className="evidence-status"><span className="proof-dot live"/><div><strong>Studionet {PROTOCOL_VERSION === 2 ? "V2" : "V1"} deployment · Chain 61999</strong><p>{PROTOCOL_VERSION === 2 ? "V2 commits bounded rendered-text evidence and allows one bonded appeal. Review the repository live-verification record for lifecycle receipts." : "These finalized deployment receipts belong to V1. No V2 deployment or lifecycle transaction is claimed by this page."}</p></div></div>
     <div className="proof-grid">{components.map(([name, address, hash]) => <article key={name}><small>{name} / CHAIN 61999</small><strong>{address}</strong><a className="tx-proof" href={`${EXPLORER_URL}/tx/${hash}`} target="_blank" rel="noreferrer">Finalized deployment transaction ↗</a></article>)}</div>
     <div className="proof-grid"><article><small>ONE-TIME COMPONENT BINDING / FINALIZED</small><a className="tx-proof" href={`${EXPLORER_URL}/tx/${bindingTx}`} target="_blank" rel="noreferrer">{bindingTx} ↗</a></article></div>
     <div className="proof-sequence">

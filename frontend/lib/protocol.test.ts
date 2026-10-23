@@ -47,6 +47,13 @@ describe("finalized transaction execution", () => {
     }, "0xabc")).toThrow("0xabc finalized but contract execution failed (FINISHED_WITH_ERROR): expiry must be in range");
   });
 
+  it("rejects a finalized receipt without validator majority agreement", () => {
+    expect(() => assertSuccessfulExecution({
+      statusName: "FINALIZED", resultName: "MAJORITY_DISAGREE",
+      txExecutionResultName: "FINISHED_WITH_RETURN",
+    }, "0xabc")).toThrow("without validator majority agreement");
+  });
+
   it("rejects a receipt that is not finalized", () => {
     expect(() => assertSuccessfulExecution({
       statusName: "ACCEPTED",
@@ -100,6 +107,9 @@ describe("recovery action eligibility", () => {
     expect(challengeExpiryAvailable({
       status: "BREACH", stage_deadline: "100",
     } as unknown as Challenge, 200)).toBe(false);
+    expect(challengeExpiryAvailable({
+      status: "APPEAL_PENDING", stage_deadline: "100",
+    } as unknown as Challenge, 100)).toBe(true);
   });
 
   it("uses explicit finalized Registry eligibility when available", () => {

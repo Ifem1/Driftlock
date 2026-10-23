@@ -1,7 +1,5 @@
-DRIFTLOCK CONTROLLED MIT TERMS FIXTURE
+DRIFTLOCK V2 CONTROLLED DEMO TERMS
 
-This Driftlock-owned test fixture publishes the standard MIT grant for the demo software. Each recipient may use, copy, modify, merge, publish, distribute, sublicense, and sell copies. Copyright and permission notices must be included in copies or substantial portions. These are the complete use conditions stated by this fixture at baseline.
+This Driftlock-owned test fixture states that recipients may use, copy, modify, publish, distribute, sublicense, and sell copies of the demo software without a current fee or prior approval. These are the complete conditions stated by this test fixture at baseline.
 
-License identifier: MIT.
-Independent reference: https://choosealicense.com/licenses/mit/
-This fixture is a controlled test source and does not amend the official MIT license.
+This is a controlled protocol test source. It does not amend or describe any third-party license.

@@ -1,6 +1,6 @@
 # V2 verification record
 
-Updated 2026-10-23. Active contract source revision: `f9793cc67ad11ebcf89b420c624e9e8ad537dced` on `milestone/driftlock-v2-assurance-appeals`. The work is local; nothing was pushed to GitHub.
+Updated 2026-10-23. Active contract source revision recorded at deployment: `f9793cc67ad11ebcf89b420c624e9e8ad537dced`. This local revision is not resolvable on GitHub. Byte-identical contract source is present in public snapshot commit `8e947566aab947aee951f0a91122902a670fa733`, on milestone head `048c86ed6ec516d1711b06f19c3f3d9b8f023a4a`; V2 was merged to `main` at `d83575698c1c3fa78c73c9b5adc1b3094d14b25a` by [PR #4](https://github.com/Ifem1/Driftlock/pull/4). The V1→V2 comparison contains 47 files from baseline `4987c25a726e2ff8db0fb5bf8f76daa750c970bb`.
 
 ## Current Studionet deployment
 
@@ -80,5 +80,5 @@ Live coverage includes the controlled compatibility-path source change, breach j
 
 The final production deployment after restoring the test fixture baseline is [`dpl_ABEmiqSHoXgfWvTyPD6nuHaPw722`](https://vercel.com/ifem1s-projects/driftlock/dpl_ABEmiqSHoXgfWvTyPD6nuHaPw722), aliased to [`https://driftlock-nine.vercel.app`](https://driftlock-nine.vercel.app). The controlled source was changed during the live breach test and restored afterward. Route and deployment status should be rechecked at closeout; prior HTTP checks returned **200** for `/`, `/create`, `/covenants`, `/activity`, `/protocol`, and `/demo`.
 
-Work settings disabled local browser use and the Chrome browser inventory was empty. No Chrome or Brave UI was used. Injected-wallet connection, network switching, signing, rejection and interactive transaction UI paths remain unverified. These HTTP/bundle checks are not browser tests. No hosted GitHub Actions run is claimed.
+Chrome UI automation was attempted, but its window-state bridge timed out on both permitted attempts. No Chrome or Brave UI was used. Injected-wallet connection, network switching, signing, rejection and interactive transaction UI paths remain unverified. These HTTP/bundle checks are not browser tests. GitHub Actions run [40013174145](https://github.com/Ifem1/Driftlock/actions/runs/40013174145) passed on exact release head `048c86ed6ec516d1711b06f19c3f3d9b8f023a4a`; PR run [40015269612](https://github.com/Ifem1/Driftlock/actions/runs/40015269612) passed contracts, frontend and CLI on that SHA. Post-merge run [40015703424](https://github.com/Ifem1/Driftlock/actions/runs/40015703424) passed all three jobs on `main` at `d83575698c1c3fa78c73c9b5adc1b3094d14b25a`.
 

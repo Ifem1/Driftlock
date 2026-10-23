@@ -12,4 +12,8 @@
 | Double withdrawal | Credit zeroed and aggregate counters updated before transfer emission | Failed transfer semantics need live fault testing |
 | Expiry while appealed | Covenant expiry rejects pending provisional/appeal stages; challenge recovery is explicit | A live delayed-child sequence remains untested |
 
+## Release state
+
+V2 was merged to `main` by PR #4 at `d83575698c1c3fa78c73c9b5adc1b3094d14b25a`. Exact-release-head and post-merge GitHub Actions runs passed contracts, frontend and CLI. Declared publisher names remain unauthenticated; the live multi-source breach-appeal lifecycle and interactive wallet paths remain unverified.
+
 There is no privileged verdict override. The current source cannot by itself prove that a corroborator is editorially independent. This limits the assurance strength and should be reviewed before a release claim.

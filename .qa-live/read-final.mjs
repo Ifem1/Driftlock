@@ -1,0 +1,11 @@
+import { createClient } from 'genlayer-js';
+import { studionet } from 'genlayer-js/chains';
+import { TransactionHashVariant } from 'genlayer-js/types';
+import { writeFileSync } from 'node:fs';
+const client = createClient({chain:studionet,endpoint:'https://studio.genlayer.com/api'});
+const read = (functionName,args=[]) => client.readContract({address:'0xf8ccE1A56C69129ff32d822af5BAa0b3081CF6F4',functionName,args,transactionHashVariant:TransactionHashVariant.LATEST_FINAL});
+const normalize = x => x instanceof Map ? Object.fromEntries([...x].map(([k,v])=>[k,normalize(v)])) : Array.isArray(x) ? x.map(normalize) : typeof x==='bigint' ? x.toString() : x && typeof x==='object' ? Object.fromEntries(Object.entries(x).map(([k,v])=>[k,normalize(v)])) : x;
+const result = {};
+for (const [name,args] of [['get_stats',[]],['get_covenant',['dl-5']],['get_credit',['0x7d1170bc98624f98183972FabD69418Bb7D5d541']],['list_challenges',['dl-5',0n,10n]]]) result[name] = normalize(await read(name,args));
+writeFileSync('.qa-live/final-readback.json',JSON.stringify(result,null,2));
+console.log(JSON.stringify({stats:result.get_stats,credit:result.get_credit,covenant:result.get_covenant.status,challenges:result.list_challenges},null,2));

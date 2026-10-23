@@ -1,0 +1,305 @@
+{
+  "get_stats": {
+    "accounting_balanced": true,
+    "admin_controls": false,
+    "appeal_escrow_atto": "0",
+    "bond_escrow_atto": "0",
+    "chain_id": "61999",
+    "claimable_atto": "0",
+    "components_configured": true,
+    "covenants_activated": "5",
+    "covenants_breached": "2",
+    "covenants_expired": "0",
+    "inspector": "0x2d14C4eF96D3B61e22F34abA232628380fa00c51",
+    "judge": "0x9144eb009DAc03e3C653bC1E5b50793B66A2Ef89",
+    "max_challenges_per_covenant": "unlimited",
+    "network": "StudioNet",
+    "product": "Driftlock",
+    "protocol_fee_bps": "0",
+    "rpc": "https://studio.genlayer.com/api",
+    "stake_escrow_atto": "3000000000000000",
+    "total_challenges": "5",
+    "total_covenants": "5",
+    "total_deposited_atto": "5700000000000000",
+    "version": "0.2.0-assurance-appeals",
+    "withdrawn_atto": "2700000000000000"
+  },
+  "get_covenant": {
+    "activated_at": "2026-10-23T22:17:21+00:00",
+    "baseline_attempt": 1,
+    "baseline_deadline": "1792795557",
+    "baseline_review": {
+      "baseline_compliant": true,
+      "basis": "The primary source explicitly confirms that recipients may use, copy, modify, publish, distribute, sublicense, and sell the software without a fee or prior approval, matching the baseline requirements.",
+      "breach_condition_present": false,
+      "contradictory": false,
+      "corroboration": [
+        "SUPPORTS"
+      ],
+      "corroboration_count": 1,
+      "evidence": [
+        {
+          "artifact": {
+            "artifact_scope": "GENLAYER_RENDERED_TEXT_NOT_RAW_HTTP_BYTES",
+            "manifest_version": 1,
+            "rendered_sha256": "b3d834ff53690d4956c2e5eac3e1e1470f61b349c86d7a89011405d98d6167d5",
+            "rendered_text": "DRIFTLOCK V2 CONTROLLED DEMO TERMS\n\nThis Driftlock-owned test fixture states that recipients may use, copy, modify, publish, distribute, sublicense, and sell copies of the demo software without a current fee or prior approval. These are the complete conditions stated by this test fixture at baseline.\n\nThis is a controlled protocol test source. It does not amend or describe any third-party license.\n",
+            "rendered_utf8_bytes": 401
+          },
+          "publisher": "driftlock project",
+          "retrieval_status": "AVAILABLE",
+          "role": "PRIMARY",
+          "url": "https://driftlock-nine.vercel.app/driftlock-test-covenant.txt"
+        },
+        {
+          "artifact": {
+            "artifact_scope": "GENLAYER_RENDERED_TEXT_NOT_RAW_HTTP_BYTES",
+            "manifest_version": 1,
+            "rendered_sha256": "6d70b6d2a3eae2d706fb6efe9c0b4e3722643e645963ea0f470fa8493783299c",
+            "rendered_text": "Driftlock Test Polic\nDriftlock test fixture: recipients may use, copy, modify, publish, distribute, sublicense and sell demo software without fees or prior approval.\nGet your own Linktree\nCookie Preferences\n•\nReport\n•\nPrivacy\n•\nAbout this account\n•\nMore from Linktree\n\nView on mobile\n\nAbout this account\nMarymmm\n\nTo help keep our community authentic, we're showing information about accounts on Linktree.\n\nJoined\nOctober 2026\n\nDriftlock Test Polic has been a member of Linktree for less than a month and joined in October 2026.\n\nMore from Linktree\nProducts\nLink in bio + tools\nManage your social media\nGrow and engage your audience\nMonetize your following\nMeasure your success\nTemplates\nMarketplace\nLearn\nResources\nHow to use Linktree\nPricing\nBlog\nHow to see who viewed your Instagram Story and what you can do about it\nHow to make a QR code menu for your restaurant\nHow do I put a link in my LinkedIn bio?\n20 motivational quotes for female athletes\nHow to clear Instagram cache on iPhone and Android\nHow to add a link to your Instagram Story (2026 guide)\nIntroducing Lifetime Clicks and Views to Make Your Content Soar\nTools\nFont generator\nHashtag generator\nInstagram grid maker\nInstagram name generator\nTikTok hashtag generator\nUsername generator\nYouTube banner maker\nYouTube hashtag generator\nYouTube logo maker\nYouTube name generator\nYouTube tag extractor\nRead more\nHow much does YouTube pay per view?\nA realtor’s guide to creating an open house sign-in sheet [template included]\nHow to add links to your YouTube channel and description\nYouTube DMs: How to message someone on YouTube\nHow to write a real estate agent bio\nHow YouTube creators can build stronger audience relationships\nHow to promote a podcast: 10 practical tips",
+            "rendered_utf8_bytes": 1741
+          },
+          "publisher": "driftlock linktree test fixture",
+          "retrieval_status": "AVAILABLE",
+          "role": "CORROBORATING",
+          "url": "https://linktr.ee/Marymmm"
+        }
+      ],
+      "kind": "BASELINE",
+      "policy_digest": "4688499d88b2eed975ce75ab175d25348ab41cd9fa1d33b3fd25e90af94cf732",
+      "protected_promise_supported": true,
+      "provenance": "BOUNDED_RENDERED_TEXT_COMMITMENT",
+      "recorded_at": "2026-10-23T22:16:33+00:00",
+      "request_id": "dl-5:baseline:1",
+      "rule_testable": true,
+      "same_subject": true,
+      "source_accessible": true,
+      "status": "BASELINE_VERIFIED",
+      "time_scope_valid": true
+    },
+    "beneficiary": "0x7d1170bc98624f98183972FabD69418Bb7D5d541",
+    "breach_challenge": "dc-5",
+    "breach_rule": "A current fee or prior approval requirement for using, copying, modifying, publishing, distributing, sublicensing or selling the demo software is a breach. The primary must state the requirement as effective now and the corroborating source must support the same change.",
+    "breached_at": "2026-10-23T22:34:24+00:00",
+    "can_challenge": false,
+    "can_expire": false,
+    "can_expire_baseline": false,
+    "canonical_url": "https://driftlock-nine.vercel.app/driftlock-test-covenant.txt",
+    "challenge_bond_atto": "100000000000000",
+    "challenge_count": 1,
+    "closed_at": "2026-10-23T22:34:24+00:00",
+    "created_at": "2026-10-23T22:15:57+00:00",
+    "evidence_policy": {
+      "min_corroborations": 1,
+      "sources": [
+        {
+          "publisher": "driftlock project",
+          "role": "PRIMARY",
+          "url": "https://driftlock-nine.vercel.app/driftlock-test-covenant.txt"
+        },
+        {
+          "publisher": "driftlock linktree test fixture",
+          "role": "CORROBORATING",
+          "url": "https://linktr.ee/Marymmm"
+        }
+      ],
+      "version": 1
+    },
+    "evidence_policy_digest": "4688499d88b2eed975ce75ab175d25348ab41cd9fa1d33b3fd25e90af94cf732",
+    "expires_at": "1793398290",
+    "finder_reward_bps": "2500",
+    "id": "dl-5",
+    "last_challenge_at": "1792794119",
+    "last_inspection": {
+      "baseline_context": {
+        "baseline_compliant": true,
+        "basis": "The primary source explicitly confirms that recipients may use, copy, modify, publish, distribute, sublicense, and sell the software without a fee or prior approval, matching the baseline requirements.",
+        "breach_condition_present": false,
+        "protected_promise_supported": true,
+        "rule_testable": true,
+        "same_subject": true,
+        "source_accessible": true,
+        "status": "BASELINE_VERIFIED",
+        "time_scope_valid": true
+      },
+      "basis": "The authoritative primary states a fee and prior approval requirement effective now, constituting a material change that breaches the protected promise.",
+      "breach_condition_now_supported": true,
+      "contradictory": false,
+      "corroboration": [
+        "SUPPORTS"
+      ],
+      "corroboration_count": 1,
+      "current_compliant": false,
+      "effective_now": true,
+      "evidence": [
+        {
+          "artifact": {
+            "artifact_scope": "GENLAYER_RENDERED_TEXT_NOT_RAW_HTTP_BYTES",
+            "manifest_version": 1,
+            "rendered_sha256": "d27867bf597a3338aac8eccfe7911c72f55a1c4c3e7322a9e27ee2e11a62fd31",
+            "rendered_text": "DRIFTLOCK V2 CONTROLLED DEMO TERMS\n\nEffective now: using, copying, modifying, publishing, distributing, sublicensing or selling the demo software requires a fee and prior approval.\n\nThis Driftlock-owned fixture is a controlled protocol test source. It does not amend or describe any third-party license.\n",
+            "rendered_utf8_bytes": 304
+          },
+          "publisher": "driftlock project",
+          "retrieval_status": "AVAILABLE",
+          "role": "PRIMARY",
+          "url": "https://driftlock-nine.vercel.app/driftlock-test-covenant.txt"
+        },
+        {
+          "artifact": {
+            "artifact_scope": "GENLAYER_RENDERED_TEXT_NOT_RAW_HTTP_BYTES",
+            "manifest_version": 1,
+            "rendered_sha256": "c4cb4746f56f37ca9003c3c47479eb5dd0902d4ac89944c30417b7d6e5f8f837",
+            "rendered_text": "Driftlock Test Polic\nEffective now: using, copying, modifying, publishing, distributing, sublicensing or selling the demo software requires a fee and prior approval.\nGet your own Linktree\nCookie Preferences\n•\nReport\n•\nPrivacy\n•\nAbout this account\n•\nMore from Linktree\n\nView on mobile\n\nAbout this account\nMarymmm\n\nTo help keep our community authentic, we're showing information about accounts on Linktree.\n\nJoined\nOctober 2026\n\nDriftlock Test Polic has been a member of Linktree for less than a month and joined in October 2026.\n\nMore from Linktree\nProducts\nLink in bio + tools\nManage your social media\nGrow and engage your audience\nMonetize your following\nMeasure your success\nTemplates\nMarketplace\nLearn\nResources\nHow to use Linktree\nPricing\nBlog\nHow to see who viewed your Instagram Story and what you can do about it\nHow to make a QR code menu for your restaurant\nHow do I put a link in my LinkedIn bio?\n20 motivational quotes for female athletes\nHow to clear Instagram cache on iPhone and Android\nHow to add a link to your Instagram Story (2026 guide)\nIntroducing Lifetime Clicks and Views to Make Your Content Soar\nTools\nFont generator\nHashtag generator\nInstagram grid maker\nInstagram name generator\nTikTok hashtag generator\nUsername generator\nYouTube banner maker\nYouTube hashtag generator\nYouTube logo maker\nYouTube name generator\nYouTube tag extractor\nRead more\nHow much does YouTube pay per view?\nA realtor’s guide to creating an open house sign-in sheet [template included]\nHow to add links to your YouTube channel and description\nYouTube DMs: How to message someone on YouTube\nHow to write a real estate agent bio\nHow YouTube creators can build stronger audience relationships\nHow to promote a podcast: 10 practical tips",
+            "rendered_utf8_bytes": 1741
+          },
+          "publisher": "driftlock linktree test fixture",
+          "retrieval_status": "AVAILABLE",
+          "role": "CORROBORATING",
+          "url": "https://linktr.ee/Marymmm"
+        }
+      ],
+      "kind": "CURRENT",
+      "policy_digest": "4688499d88b2eed975ce75ab175d25348ab41cd9fa1d33b3fd25e90af94cf732",
+      "promise_still_supported": false,
+      "provenance": "BOUNDED_RENDERED_TEXT_COMMITMENT",
+      "recorded_at": "2026-10-23T22:22:36+00:00",
+      "request_id": "dc-5",
+      "same_subject": true,
+      "source_accessible": true,
+      "status": "MATERIAL_CHANGE"
+    },
+    "owner": "0xD6423aE82a975d55C6CeaC222827A727325e0459",
+    "pending_challenge": "",
+    "permitted_changes": "Formatting, spelling, clarification and changes unrelated to the protected promise are permitted.",
+    "protected_promise": "Recipients may use, copy, modify, publish, distribute, sublicense and sell copies of the demo software without a current fee or prior approval.",
+    "protocol_version": 2,
+    "remaining_stake_atto": "0",
+    "stake_atto": "1000000000000000",
+    "status": "BREACHED",
+    "subject": "Any fee must be disclosed, and prior approval is required before a charge.",
+    "title": "Driftlock V2 multi-source QA"
+  },
+  "get_credit": "0",
+  "list_challenges": {
+    "items": [
+      {
+        "appeal_bond_atto": "100000000000000",
+        "appeal_bond_recipient": "0x7d1170bc98624f98183972FabD69418Bb7D5d541",
+        "appeal_bond_released": true,
+        "appeal_deadline": "1792797900",
+        "appeal_judgment": {
+          "basis": "The committed primary rendered text expressly states: \"Effective now: using, copying, modifying, publishing, distributing, sublicensing or selling the demo software requires a fee and prior approval.\" This directly imposes a current fee requirement and a prior-approval requirement on the exact demo-software activities covered by the protected promise, which permits those activities without either. The corroborating rendered text repeats the same operative requirement. The rebuttal does not establish permission: even if its quoted subject already contemplated approval before a charge, it does not negate the primary's current fee requirement or show that the requirement is permitted. The source disclaimer is not an express permission.",
+          "breach_supported": true,
+          "corroboration": [
+            "SUPPORTS"
+          ],
+          "effective_now": true,
+          "evidence_digest": "cdc2cc142b9a7cfc850f7bac0504862a2fc8e86a8d289af9851e14aedec33251",
+          "kind": "APPEAL",
+          "outcome": "BREACH",
+          "permitted_by_rule": false,
+          "policy_digest": "4688499d88b2eed975ce75ab175d25348ab41cd9fa1d33b3fd25e90af94cf732",
+          "provenance": "COMMITTED_RENDERED_TEXT_REASSESSMENT",
+          "recorded_at": "2026-10-23T22:28:18+00:00",
+          "request_id": "dc-5:appeal:1",
+          "same_subject": true
+        },
+        "appeal_request_id": "dc-5:appeal:1",
+        "appeal_result": "UPHELD",
+        "appellant": "0xD6423aE82a975d55C6CeaC222827A727325e0459",
+        "bond_atto": "100000000000000",
+        "bond_recipient": "0x7d1170bc98624f98183972FabD69418Bb7D5d541",
+        "bond_released": true,
+        "can_expire": false,
+        "can_finalize": false,
+        "challenger": "0x7d1170bc98624f98183972FabD69418Bb7D5d541",
+        "covenant_id": "dl-5",
+        "created_at": "2026-10-23T22:21:59+00:00",
+        "finder_reward_atto": "250000000000000",
+        "id": "dc-5",
+        "inspection": {
+          "baseline_context": {
+            "baseline_compliant": true,
+            "basis": "The primary source explicitly confirms that recipients may use, copy, modify, publish, distribute, sublicense, and sell the software without a fee or prior approval, matching the baseline requirements.",
+            "breach_condition_present": false,
+            "protected_promise_supported": true,
+            "rule_testable": true,
+            "same_subject": true,
+            "source_accessible": true,
+            "status": "BASELINE_VERIFIED",
+            "time_scope_valid": true
+          },
+          "basis": "The authoritative primary states a fee and prior approval requirement effective now, constituting a material change that breaches the protected promise.",
+          "breach_condition_now_supported": true,
+          "contradictory": false,
+          "corroboration": [
+            "SUPPORTS"
+          ],
+          "corroboration_count": 1,
+          "current_compliant": false,
+          "effective_now": true,
+          "evidence": [
+            {
+              "artifact": {
+                "artifact_scope": "GENLAYER_RENDERED_TEXT_NOT_RAW_HTTP_BYTES",
+                "manifest_version": 1,
+                "rendered_sha256": "d27867bf597a3338aac8eccfe7911c72f55a1c4c3e7322a9e27ee2e11a62fd31",
+                "rendered_text": "DRIFTLOCK V2 CONTROLLED DEMO TERMS\n\nEffective now: using, copying, modifying, publishing, distributing, sublicensing or selling the demo software requires a fee and prior approval.\n\nThis Driftlock-owned fixture is a controlled protocol test source. It does not amend or describe any third-party license.\n",
+                "rendered_utf8_bytes": 304
+              },
+              "publisher": "driftlock project",
+              "retrieval_status": "AVAILABLE",
+              "role": "PRIMARY",
+              "url": "https://driftlock-nine.vercel.app/driftlock-test-covenant.txt"
+            },
+            {
+              "artifact": {
+                "artifact_scope": "GENLAYER_RENDERED_TEXT_NOT_RAW_HTTP_BYTES",
+                "manifest_version": 1,
+                "rendered_sha256": "c4cb4746f56f37ca9003c3c47479eb5dd0902d4ac89944c30417b7d6e5f8f837",
+                "rendered_text": "Driftlock Test Polic\nEffective now: using, copying, modifying, publishing, distributing, sublicensing or selling the demo software requires a fee and prior approval.\nGet your own Linktree\nCookie Preferences\n•\nReport\n•\nPrivacy\n•\nAbout this account\n•\nMore from Linktree\n\nView on mobile\n\nAbout this account\nMarymmm\n\nTo help keep our community authentic, we're showing information about accounts on Linktree.\n\nJoined\nOctober 2026\n\nDriftlock Test Polic has been a member of Linktree for less than a month and joined in October 2026.\n\nMore from Linktree\nProducts\nLink in bio + tools\nManage your social media\nGrow and engage your audience\nMonetize your following\nMeasure your success\nTemplates\nMarketplace\nLearn\nResources\nHow to use Linktree\nPricing\nBlog\nHow to see who viewed your Instagram Story and what you can do about it\nHow to make a QR code menu for your restaurant\nHow do I put a link in my LinkedIn bio?\n20 motivational quotes for female athletes\nHow to clear Instagram cache on iPhone and Android\nHow to add a link to your Instagram Story (2026 guide)\nIntroducing Lifetime Clicks and Views to Make Your Content Soar\nTools\nFont generator\nHashtag generator\nInstagram grid maker\nInstagram name generator\nTikTok hashtag generator\nUsername generator\nYouTube banner maker\nYouTube hashtag generator\nYouTube logo maker\nYouTube name generator\nYouTube tag extractor\nRead more\nHow much does YouTube pay per view?\nA realtor’s guide to creating an open house sign-in sheet [template included]\nHow to add links to your YouTube channel and description\nYouTube DMs: How to message someone on YouTube\nHow to write a real estate agent bio\nHow YouTube creators can build stronger audience relationships\nHow to promote a podcast: 10 practical tips",
+                "rendered_utf8_bytes": 1741
+              },
+              "publisher": "driftlock linktree test fixture",
+              "retrieval_status": "AVAILABLE",
+              "role": "CORROBORATING",
+              "url": "https://linktr.ee/Marymmm"
+            }
+          ],
+          "kind": "CURRENT",
+          "policy_digest": "4688499d88b2eed975ce75ab175d25348ab41cd9fa1d33b3fd25e90af94cf732",
+          "promise_still_supported": false,
+          "provenance": "BOUNDED_RENDERED_TEXT_COMMITMENT",
+          "recorded_at": "2026-10-23T22:22:36+00:00",
+          "request_id": "dc-5",
+          "same_subject": true,
+          "source_accessible": true,
+          "status": "MATERIAL_CHANGE"
+        },
+        "judgment": {
+          "basis": "The primary source affirmatively states that using, copying, modifying, publishing, distributing, sublicensing, or selling the demo software now requires a fee and prior approval. This requirement is explicitly defined as a breach by the rule and contradicts the protected promise that such actions be permitted without fees or approval.",
+          "breach_supported": true,
+          "corroboration": [
+            "SUPPORTS"
+          ],
+          "effective_now": true,
+          "evidence_digest": "cdc2cc142b9a7cfc850f7bac0504862a2fc8e86a8d289af9851e14aedec33251",
+          "kind": "JUDGMENT",
+          "outcome": "BREACH",
+          "permitted_by_rule": false,
+          "policy_digest": "4688499d88b2eed975ce75ab175d25348ab41cd9fa1d33b3fd25e90af94cf732",
+          "provenance": "COMMITTED_RENDERED_TEXT_REASSESSMENT",
+          "recorded_at": "2026-10-23T22:24:13+00:00",
+          "request_id": "dc-5",
+          "same_subject": true
+        },
+        "rebuttal": "Please reassess the same committed incident evidence in light of an inconsistency in the frozen covenant. The subject says: 'Any fee must be disclosed, and prior approval is required before a charge.' The protected promise permits demo-software activity without a current fee or prior approval. The subject therefore already contemplates prior approval, whereas the breach rule prohibits a new approval requirement. Please determine whether this conflicting scope makes the provisional breach insufficiently established or inconclusive. I acknowledge that both committed sources contain the new fee and prior-approval requirement; this appeal does not dispute or replace those artifacts.",
+        "settled_at": "2026-10-23T22:34:24+00:00",
+        "stage_deadline": "1792796265",
+        "status": "BREACH"
+      }
+    ],
+    "total": "1"
+  }
+}

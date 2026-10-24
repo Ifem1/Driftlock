@@ -1,0 +1,16 @@
+[
+  {
+    "url": "https://driftlock-nine.vercel.app/driftlock-test-covenant.txt",
+    "status": 200,
+    "scope": "RAW_HTTP_RESPONSE_BODY_NOT_GENLAYER_RENDERED_TEXT",
+    "bytes": 402,
+    "sha256": "3a404a6d4b23187efe6f0d5284388c7aa0ee91e97951d81ff3e9dcc9908ed6eb"
+  },
+  {
+    "url": "https://linktr.ee/Marymmm",
+    "status": 200,
+    "scope": "RAW_HTTP_RESPONSE_BODY_NOT_GENLAYER_RENDERED_TEXT",
+    "bytes": 160116,
+    "sha256": "c2fb175eee36e5fe214aaafd6d87757e07047ca5fb12b24881ef25ff55cb2092"
+  }
+]

@@ -1,0 +1,5 @@
+DRIFTLOCK V2 CONTROLLED DEMO TERMS
+
+This Driftlock-owned test fixture states that recipients may use, copy, modify, publish, distribute, sublicense, and sell copies of the demo software without a current fee or prior approval. These are the complete conditions stated by this test fixture at baseline.
+
+This is a controlled protocol test source. It does not amend or describe any third-party license.

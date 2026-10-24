@@ -1,5 +1,5 @@
-DRIFTLOCK DEMO COMPANY POLICY
+DRIFTLOCK V2 CONTROLLED DEMO TERMS — MIRROR
 
-Customer information is not sold, licensed or commercially transferred to third parties.
+This separately hosted Driftlock-controlled mirror confirms that recipients may use, copy, modify, publish, distribute, sublicense, and sell copies of the demo software without a current fee or prior approval. These are the complete conditions stated by this mirror at baseline.
 
-This file is intentionally simple so a reviewer can inspect a before/after public promise at one stable URL during the live Studionet demonstration.
+The primary fixture and this mirror are controlled by the same Driftlock project. Separate hosting does not prove separate ownership or editorial independence.

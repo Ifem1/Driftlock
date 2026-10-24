@@ -32,7 +32,7 @@ The source audit also checked component sender authentication, single binding, s
 
 The October 2026 dependency refresh preserves the Next.js 15.5.28 application and applies compatible lockfile overrides. Fresh online root and frontend npm audits returned zero vulnerabilities; the release verification record retains the exact gate results.
 
-V1 browser reports elsewhere in this repository are historical. For current V2 work, local browser use was disabled in Work settings, so no Chrome or Brave injected-wallet UI verification is claimed. CI does not automate wallet interaction. The current Studionet finalization/RPC limitation and production HTTP checks are documented in `milestone-v2/LIVE_VERIFICATION.md`.
+V1 browser reports elsewhere in this repository are historical. For current V2, the recorded Chrome wallet QA covered account changes, refresh recovery, wrong-network handling and signed lifecycle transactions. Explicit transaction rejection remains untested, and CI does not automate wallet interaction. The current Studionet finalization/RPC limitation and production HTTP checks are documented in `milestone-v2/LIVE_VERIFICATION.md`.
 
 ## Source evidence retention
 
